@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- 基本配置的类，各种系统配置 -->
+	<bean id="config" class="com.whty.tsm.common.util.Config" lazy-init="false">
+		<!-- 交易处理码 -->
+		<property name="transactionId">
+			<map>
+				<!-- 注意类名大小写，默认是类名首字母小写 -->
+				<entry key="000601" value="appDelete" /><!-- 应用删除 -->
+				<entry key="900601" value="ticketAppDownload" /><!-- 票卷类应用下载交易处理 -->
+			</map>
+		</property>
+		<!-- 任务标识 -->
+		<property name="taskID">
+			<map>
+				<!-- 注意类名大小写，默认是类名首字母小写 -->
+				<entry key="1" value="ticketAppDownloadTask" />
+				<!-- <entry key="2" value="AppDelete" /> -->
+			</map>
+		</property>
+	</bean>
+
+	<!-- 票卷类应用下载交易处理 -->
+	<bean id="ticketAppDownload" class="java.util.Vector">
+		<constructor-arg>
+			<list>
+				<value type="java.lang.Integer">1</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="appDelete" class="java.util.Vector">
+		<constructor-arg>
+			<list>
+				<value type="java.lang.Integer">1</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ticketAppDownloadTask" class="com.whty.tsm.http.task.TicketAppDownloadTask">
+		<property name="respCode" value="900701" /><!-- 交易处理码 -->
+		<property name="msgType" value="9101" /><!-- 消息类型 -->
+		<property name="servType" value="102" /><!-- 服务请求参数 -->
+	</bean>
+
+
+</beans>
