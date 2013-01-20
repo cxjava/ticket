@@ -9,15 +9,15 @@ public class TestOCR
   public static void main(String[] args)
     throws IOException
   {
-    String path = "F:\\Downloads\\auto-scheduleticket\\image\\passCodeAction.jpg";
-    try {
-      String valCode = new OCR().recognizeText(null, new File(path), "jpg");
-      System.out.println("aaa:"+valCode);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+//    String path = "F:\\Downloads\\auto-scheduleticket\\image\\passCodeAction.jpg";
+//    try {
+//     // String valCode = new OCR().recognizeText(null, new File(path), "jpg");
+//      //System.out.println("aaa:"+valCode);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
   }
 }
 
