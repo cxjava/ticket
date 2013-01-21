@@ -38,7 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.cxjava.ticket.orc.BinaryTest;
+import com.cxjava.ticket.ocr.OCR;
 
 
 /**
@@ -59,8 +59,11 @@ public class OCRTest {
 						"http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand")
 						.openStream());
 		BufferedImage output=BinaryTest.get(bufferedImage,0);
-		String randCodeByRob = OCR.read(output.);			
-		label.setIcon(new ImageIcon(FileUtils.readFileToByteArray(output)));
+		File file=new File("D:\\05_Document\\Downloads\\passCodeAction.jpg");
+		ImageIO.write(output, "jpg", file);
+		
+		String randCodeByRob = OCR.read(FileUtils.readFileToByteArray(file));			
+		label.setIcon(new ImageIcon(FileUtils.readFileToByteArray(file)));
 		label.setText(randCodeByRob);
 		label.addMouseListener(new MouseAdapter() {
 			@Override
@@ -70,9 +73,12 @@ public class OCRTest {
 							.read(new URL(
 									"http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand")
 									.openStream());
-					File output=BinaryTest.get(bufferedImage,0);
-					String randCodeByRob = OCR.read(output);			
-					label.setIcon(new ImageIcon(FileUtils.readFileToByteArray(output)));
+					BufferedImage output=BinaryTest.get(bufferedImage,0);
+					File file=new File("D:\\05_Document\\Downloads\\passCodeAction.jpg");
+					ImageIO.write(output, "jpg", file);
+					
+					String randCodeByRob = OCR.read(FileUtils.readFileToByteArray(file));			
+					label.setIcon(new ImageIcon(FileUtils.readFileToByteArray(file)));
 					label.setText(randCodeByRob);
 					System.out.println("aa:"+randCodeByRob);
 				} catch (Exception e1) {
