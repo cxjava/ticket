@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.sun.media.imageio.plugins.tiff.TIFFImageWriteParam;
+import com.twelvemonkeys.imageio.plugins.iff.IFFImageWriter;
 
 public class OCRUtil {
 
@@ -137,6 +138,7 @@ public class OCRUtil {
 			// Set up the writeParam
 			TIFFImageWriteParam tiffWriteParam = new TIFFImageWriteParam(
 					Locale.US);
+			IFFImageWriter iffImageWriter=new IFFImageWriter();
 			tiffWriteParam.setCompressionMode(ImageWriteParam.MODE_DISABLED);
 
 			// Get tif writer and set output to file
