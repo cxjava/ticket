@@ -10,12 +10,12 @@ import javax.imageio.ImageIO;
 
 public class BinaryTest {
 
-	public static File binaryImage(File inputFile, String formatName, File outFile) throws IOException {
-		return binaryImage(ImageIO.read(inputFile), formatName, outFile);
+	public static void binaryImage(File inputFile, String formatName, File outFile) throws IOException {
+		binaryImage(ImageIO.read(inputFile), formatName, outFile);
 	}
 
-	public static File binaryImage(InputStream inputStream, String formatName, File outFile) throws IOException {
-		return binaryImage(ImageIO.read(inputStream), formatName, outFile);
+	public static void binaryImage(InputStream inputStream, String formatName, File outFile) throws IOException {
+		binaryImage(ImageIO.read(inputStream), formatName, outFile);
 	}
 
 	/**
@@ -30,7 +30,7 @@ public class BinaryTest {
 	 * @return
 	 * @throws IOException
 	 */
-	public static File binaryImage(BufferedImage bufferedImage, String formatName, File outFile) throws IOException {
+	public static void binaryImage(BufferedImage bufferedImage, String formatName, File outFile) throws IOException {
 		int h = bufferedImage.getHeight();
 		int w = bufferedImage.getWidth();
 
@@ -83,7 +83,6 @@ public class BinaryTest {
 		// }
 		ImageIO.write(binaryBufferedImage, formatName, outFile);
 
-		return outFile;
 	}
 
 	public static boolean isBlack(int colorInt) {
