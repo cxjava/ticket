@@ -62,6 +62,8 @@ public class OCRTest {
 			public void mouseClicked(MouseEvent e) {
 				try {
 					File file = new File("D:\\05_Document\\Downloads\\passCodeAction.jpg");
+					//https://dynamic.12306.cn/otsweb/passCodeAction.do?rand=randp
+					//http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand
 					BinaryTest.binaryImage(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), "jpg",
 							file);
 					String randCodeByRob = OCR.read(file);

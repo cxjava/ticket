@@ -26,8 +26,8 @@ public class OCR {
 		cmd.add("");
 		cmd.add(outputFile.getName());
 		cmd.add(LANG_OPTION);
-		// cmd.add("verify");
-		cmd.add("eng");
+//		 cmd.add("verify");
+		cmd.add("12306");
 		// cmd.add("nobatch");
 		// cmd.add("digits");
 
