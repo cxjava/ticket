@@ -65,6 +65,8 @@ public class OCRTest {
 					BinaryTest.binaryImage(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), "jpg",
 							file);
 					String randCodeByRob = OCR.read(file);
+//					File codeFile =new File("D:\\05_Document\\Downloads\\"+randCodeByRob+".jpg");
+//					FileUtils.copyFile(file, codeFile);
 					label.setIcon(new ImageIcon(FileUtils.readFileToByteArray(file)));
 					label.setText(randCodeByRob);
 					LOG.debug("randCodeByRob : {}.", randCodeByRob);
