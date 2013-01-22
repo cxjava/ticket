@@ -1,4 +1,4 @@
-package com.cxjava.ticket.orc;
+package com.cxjava.ticket.temp;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;

@@ -1,35 +1,36 @@
-/**
- * 
- */
 package com.cxjava.ticket.ocr;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
 public class BinaryTest {
 
-	public static void main(String[] args) throws IOException {
-		for (int i = 0; i < 10; i++) {
-			BufferedImage bufferedImage = ImageIO
-					.read(new URL(
-							"http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand")
-							.openStream());
-			get(bufferedImage,i);
-		}
-
+	public static File binaryImage(File inputFile, String formatName, File outFile) throws IOException {
+		return binaryImage(ImageIO.read(inputFile), formatName, outFile);
 	}
 
-	public static File get(BufferedImage bufferedImage, int i)
-			throws IOException {
+	public static File binaryImage(InputStream inputStream, String formatName, File outFile) throws IOException {
+		return binaryImage(ImageIO.read(inputStream), formatName, outFile);
+	}
 
-		// BufferedImage bufferedImage = ImageIO.read(new
-		// File("F:/Downloads/auto-scheduleticket/image/passCodeAction.jpg"));
+	/**
+	 * 图像灰度化与 二值化
+	 * 
+	 * @see http://www.oschina.net/code/snippet_147955_17496
+	 * 
+	 * @param bufferedImage
+	 * @param formatName
+	 *            后缀名
+	 * @param outFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static File binaryImage(BufferedImage bufferedImage, String formatName, File outFile) throws IOException {
 		int h = bufferedImage.getHeight();
 		int w = bufferedImage.getWidth();
 
@@ -51,16 +52,13 @@ public class BinaryTest {
 				if (b >= 255) {
 					b = 255;
 				}
-				gray[x][y] = (int) Math
-						.pow((Math.pow(r, 2.2) * 0.2973 + Math.pow(g, 2.2)
-								* 0.6274 + Math.pow(b, 2.2) * 0.0753), 1 / 2.2);
+				gray[x][y] = (int) Math.pow((Math.pow(r, 2.2) * 0.2973 + Math.pow(g, 2.2) * 0.6274 + Math.pow(b, 2.2) * 0.0753), 1 / 2.2);
 			}
 		}
 
 		// 二值化
 		int threshold = ostu(gray, w, h);
-		BufferedImage binaryBufferedImage = new BufferedImage(w, h,
-				BufferedImage.TYPE_BYTE_BINARY);
+		BufferedImage binaryBufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				if (gray[x][y] > threshold) {
@@ -73,22 +71,19 @@ public class BinaryTest {
 		}
 
 		// 矩阵打印
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				if (isBlack(binaryBufferedImage.getRGB(x, y))) {
-					System.out.print("*");
-				} else {
-					System.out.print(" ");
-				}
-			}
-			System.out.println();
-		}
-		OutputStream output=null;
-		File file=new File(
-				"F:/Downloads/auto-scheduleticket/image/"+i+".jpg");
-		ImageIO.write(binaryBufferedImage, "jpg", file);
-		
-		return file;
+		// for (int y = 0; y < h; y++) {
+		// for (int x = 0; x < w; x++) {
+		// if (isBlack(binaryBufferedImage.getRGB(x, y))) {
+		// System.out.print("*");
+		// } else {
+		// System.out.print(" ");
+		// }
+		// }
+		// System.out.println();
+		// }
+		ImageIO.write(binaryBufferedImage, formatName, outFile);
+
+		return outFile;
 	}
 
 	public static boolean isBlack(int colorInt) {

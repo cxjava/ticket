@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.cxjava.ticket.orc;
+package com.cxjava.ticket.temp;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
