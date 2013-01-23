@@ -28,8 +28,8 @@ public class OCR {
 		cmd.add(LANG_OPTION);
 //		 cmd.add("verify");
 		cmd.add("12306");
-		// cmd.add("nobatch");
-		// cmd.add("digits");
+		 cmd.add("nobatch");
+		 cmd.add("digits");
 
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.directory(imageFile.getParentFile());
