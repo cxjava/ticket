@@ -40,9 +40,9 @@ public class BinaryTest {
 			for (int y = 0; y < h; y++) {
 				int argb = bufferedImage.getRGB(x, y);
 				// 图像加亮（调整亮度识别率非常高）
-				int r = (int) (((argb >> 16) & 0xFF) * 1.2 + 40);
-				int g = (int) (((argb >> 8) & 0xFF) * 1.2 + 40);
-				int b = (int) (((argb >> 0) & 0xFF) * 1.2 + 40);
+				int r = (int) (((argb >> 16) & 0xFF) * 1.15 + 45);
+				int g = (int) (((argb >> 8) & 0xFF) * 1.15 + 45);
+				int b = (int) (((argb >> 0) & 0xFF) * 1.15 + 45);
 				if (r >= 255) {
 					r = 255;
 				}
@@ -58,6 +58,7 @@ public class BinaryTest {
 
 		// 二值化
 		int threshold = ostu(gray, w, h);
+		System.out.println(threshold);
 		BufferedImage binaryBufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {

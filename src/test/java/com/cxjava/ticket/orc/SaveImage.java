@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.io.FileUtils;
-
 import com.cxjava.ticket.ocr.BinaryTest;
 
 /**
@@ -21,10 +19,10 @@ public class SaveImage {
 	 * @throws MalformedURLException
 	 */
 	public static void main(String[] args) throws MalformedURLException, IOException {
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 50; i++) {
 			File file = new File("D:\\05_Document\\Downloads\\12306\\" + i + ".jpg");
-//			BinaryTest.binaryImage(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), "jpg", file);
-			FileUtils.copyInputStreamToFile(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), file);
+			BinaryTest.binaryImage(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), "jpg", file);
+			// FileUtils.copyInputStreamToFile(new URL("http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand").openStream(), file);
 		}
 	}
 
