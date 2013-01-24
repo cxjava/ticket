@@ -30,8 +30,11 @@ public class Login {
 	/** httpClient */
 	private HttpClient httpClient;
 
+	/** 截取随机数的前半部分 */
 	private String randomCodeOpen;
+	/** 截取随机数的后半部分 */
 	private String randomCodeClose;
+
 	/**
 	 * 获取随机数
 	 * 
@@ -135,7 +138,8 @@ public class Login {
 	}
 
 	/**
-	 * @param randomCodeOpen the randomCodeOpen to set
+	 * @param randomCodeOpen
+	 *            the randomCodeOpen to set
 	 */
 	public void setRandomCodeOpen(String randomCodeOpen) {
 		this.randomCodeOpen = randomCodeOpen;
@@ -149,11 +153,11 @@ public class Login {
 	}
 
 	/**
-	 * @param randomCodeClose the randomCodeClose to set
+	 * @param randomCodeClose
+	 *            the randomCodeClose to set
 	 */
 	public void setRandomCodeClose(String randomCodeClose) {
 		this.randomCodeClose = randomCodeClose;
 	}
 
-	
 }

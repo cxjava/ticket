@@ -53,17 +53,6 @@ public class ClientCore {
 		}
 	};
 
-	public ClientCore() {
-//		try {
-//			init();
-//			setParams();
-//		} catch (KeyManagementException e) {
-//			LOG.error("KeyManagementException : {}.", e);
-//		} catch (NoSuchAlgorithmException e) {
-//			LOG.error("NoSuchAlgorithmException : {}.", e);
-//		}
-	}
-
 	private void init() throws KeyManagementException, NoSuchAlgorithmException {
 		SSLContext sslcontext = SSLContext.getInstance("TLS");
 		sslcontext.init(null, new TrustManager[] { trustManager }, null);
@@ -92,7 +81,8 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param httpClient the httpClient to set
+	 * @param httpClient
+	 *            the httpClient to set
 	 */
 	public void setHttpClient(DefaultHttpClient httpClient) {
 		this.httpClient = httpClient;
@@ -106,7 +96,8 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param isProxy the isProxy to set
+	 * @param isProxy
+	 *            the isProxy to set
 	 */
 	public void setIsProxy(String isProxy) {
 		this.isProxy = isProxy;
@@ -120,7 +111,8 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param proxyIp the proxyIp to set
+	 * @param proxyIp
+	 *            the proxyIp to set
 	 */
 	public void setProxyIp(String proxyIp) {
 		this.proxyIp = proxyIp;
@@ -134,7 +126,8 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param proxyPort the proxyPort to set
+	 * @param proxyPort
+	 *            the proxyPort to set
 	 */
 	public void setProxyPort(Integer proxyPort) {
 		this.proxyPort = proxyPort;
@@ -148,7 +141,8 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param proxyUserName the proxyUserName to set
+	 * @param proxyUserName
+	 *            the proxyUserName to set
 	 */
 	public void setProxyUserName(String proxyUserName) {
 		this.proxyUserName = proxyUserName;
@@ -162,22 +156,24 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param proxyPassword the proxyPassword to set
+	 * @param proxyPassword
+	 *            the proxyPassword to set
 	 */
 	public void setProxyPassword(String proxyPassword) {
 		this.proxyPassword = proxyPassword;
 	}
 
 	/**
-	 * @return the params
-	 自定义所有参数信息 */
+	 * @return the params 自定义所有参数信息
+	 */
 	public HashMap<String, Object> getParams() {
 		return params;
 	}
 
 	/**
-	 * @param params the params to set
-	 自定义所有参数信息 */
+	 * @param params
+	 *            the params to set 自定义所有参数信息
+	 */
 	public void setParams(HashMap<String, Object> params) {
 		this.params = params;
 	}
@@ -190,11 +186,11 @@ public class ClientCore {
 	}
 
 	/**
-	 * @param connectionManager the connectionManager to set
+	 * @param connectionManager
+	 *            the connectionManager to set
 	 */
 	public void setConnectionManager(ClientConnectionManager connectionManager) {
 		this.connectionManager = connectionManager;
 	}
-	
-	
+
 }

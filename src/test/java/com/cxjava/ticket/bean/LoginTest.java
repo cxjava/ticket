@@ -39,8 +39,9 @@ public class LoginTest extends Base {
 		assertNotNull(login.getLoginRandomCodeUrl());
 		assertNotNull(login.getLoginUrl());
 	}
+
 	@Test
-	public void getRandomCode(){
+	public void getRandomCode() {
 		LOG.debug("login.getRandomCode() : {}", login.getRandomCode());
 	}
 }
