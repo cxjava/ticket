@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- 登录 -->
+	<bean id="login" class="com.cxjava.ticket.bean.Login">
+		<!-- 请求头信息 -->
+		<property name="headers" ref="headers" />
+		<property name="referer"
+			value="https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init" />
+		<property name="loginRandomCodeUrl" value="${loginRandomCodeUrl}" />
+		<property name="loginCodeUrl" value="${loginCodeUrl}" />
+		<property name="loginFormUrl" value="${loginFormUrl}" />
+		<property name="loginMainPageUrl" value="${loginMainPageUrl}" />
+		<property name="randomCodeOpen" value="${randomCodeOpen}" />
+		<property name="randomCodeClose" value="${randomCodeClose}" />
+		<property name="httpClient" ref="httpClient" />
+		<property name="staticParameters">
+			<map>
+				<entry key="refundLogin" value="N" />
+				<entry key="refundFlag" value="Y" />
+				<entry key="nameErrorFocus" value="" />
+				<entry key="passwordErrorFocus" value="" />
+				<entry key="randErrorFocus" value="" />
+			</map>
+		</property>
+		<property name="dynamicParameters">
+			<map>
+				<entry key="loginRand" value="loginRand" />
+				<entry key="loginUser.user_name" value="username" />
+				<entry key="user.password" value="password" />
+				<entry key="randCode" value="captcha" />
+			</map>
+		</property>
+		<property name="username" value="${login.username}" />
+		<property name="password" value="${login.password}" />
+		<property name="isProxy" value="${isProxy}" />
+		<property name="proxyIp" value="${proxyIp}" />
+		<property name="proxyPort" value="${proxyPort}" />
+	</bean>
+
+</beans>

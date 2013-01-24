@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
 import com.cxjava.ticket.ocr.OCR;
 
 /**
- * 登录相关
+ * 查询车票
  * 
  * @author Maty Chen
- * @date 2013-1-24上午10:28:56
+ * @date 2013-1-24下午11:49:56
  */
-public class Login {
-	private static final Logger LOG = LoggerFactory.getLogger(Login.class);
+public class Query {
+	private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 	/** 获取随机数地址 */
 	private String loginRandomCodeUrl;
 	/** 验证码地址 */

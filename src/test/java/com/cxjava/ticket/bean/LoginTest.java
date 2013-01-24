@@ -56,7 +56,7 @@ public class LoginTest extends Base {
 		LOG.debug("login.login() : {}", login.login());
 		//获取个人资料来验证是否登录成功
 		String body=login.doHttpGet("https://dynamic.12306.cn/otsweb/sysuser/editMemberAction.do?method=initEdit");
-		assertTrue(body.contains("手机号码"));
+		assertTrue(body.contains("手机号码")||body.contains("系统例行维护时间"));
 	}
 
 }

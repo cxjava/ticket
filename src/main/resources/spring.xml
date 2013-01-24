@@ -27,6 +27,7 @@
 	<import resource="classpath:/httpclient/spring-httpclient-ssl.xml" />
 	<import resource="classpath:/httpclient/spring-httpclient.xml" />
 	<import resource="classpath*:/spring-constants.xml" />
-	<import resource="classpath*:/spring-http.xml" />
+	<import resource="classpath*:/spring-login.xml" />
+	<import resource="classpath*:/spring-query.xml" />
 
 </beans>

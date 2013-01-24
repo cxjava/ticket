@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
-	
+
 	<!-- 登录 -->
 	<bean id="login" class="com.cxjava.ticket.bean.Login">
 		<!-- 请求头信息 -->
 		<property name="headers" ref="headers" />
-		<property name="referer" value="https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init" />
+		<property name="referer"
+			value="https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init" />
 		<property name="loginRandomCodeUrl" value="${loginRandomCodeUrl}" />
 		<property name="loginCodeUrl" value="${loginCodeUrl}" />
 		<property name="loginFormUrl" value="${loginFormUrl}" />
 		<property name="loginMainPageUrl" value="${loginMainPageUrl}" />
 		<property name="randomCodeOpen" value="${randomCodeOpen}" />
 		<property name="randomCodeClose" value="${randomCodeClose}" />
-		<property name="httpClient" ref="httpClient"/>
+		<property name="httpClient" ref="httpClient" />
 		<property name="staticParameters">
 			<map>
 				<entry key="refundLogin" value="N" />
@@ -38,12 +40,5 @@
 		<property name="proxyIp" value="${proxyIp}" />
 		<property name="proxyPort" value="${proxyPort}" />
 	</bean>
-	<!-- <bean id="clientCore" class="com.cxjava.ticket.bean.ClientCore">
-		<property name="isProxy" value="${isProxy}" />
-		<property name="proxyIp" value="${proxyIp}" />
-		<property name="proxyPort" value="${proxyPort}" />
-		<property name="connectionManager" ref="connectionManager" />
-	</bean> -->
-
 
 </beans>
