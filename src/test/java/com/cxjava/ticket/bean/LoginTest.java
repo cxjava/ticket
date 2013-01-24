@@ -28,20 +28,35 @@ public class LoginTest extends Base {
 	}
 
 	@Test
+	public void getMainPage() {
+		login.getMainPage();
+	}
+
+	@Test
 	public void parameters() {
-		LOG.info("login.getLogin : {}.", login.getLoginCodeUrl());
-		LOG.info("login.getLogin : {}.", login.getLoginRandomCodeUrl());
-		LOG.info("login.getLogin : {}.", login.getLoginUrl());
 		for (Map.Entry<String, String> entry : login.getHeaders().entrySet()) {
 			LOG.info(" {} : {}", entry.getKey(), entry.getValue());
 		}
 		assertNotNull(login.getLoginCodeUrl());
 		assertNotNull(login.getLoginRandomCodeUrl());
-		assertNotNull(login.getLoginUrl());
+		assertNotNull(login.getLoginFormUrl());
 	}
 
 	@Test
 	public void getRandomCode() {
 		LOG.debug("login.getRandomCode() : {}", login.getRandomCode());
 	}
+	@Test
+	public void getCaptcha() {
+		LOG.debug("login.getCaptcha() : {}", login.getCaptcha());
+		assertNotNull(login.getCaptcha());
+	}
+	@Test
+	public void login() {
+		LOG.debug("login.login() : {}", login.login());
+		//获取个人资料来验证是否登录成功
+		String body=login.doHttpGet("https://dynamic.12306.cn/otsweb/sysuser/editMemberAction.do?method=initEdit");
+		assertTrue(body.contains("手机号码"));
+	}
+
 }

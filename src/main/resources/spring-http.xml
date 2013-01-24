@@ -6,37 +6,36 @@
 	<!-- 登录 -->
 	<bean id="login" class="com.cxjava.ticket.bean.Login">
 		<!-- 请求头信息 -->
-		<property name="headers">
-			<map>
-				<entry key="Referer" value="https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init" />
-				<entry key="Accept-Encoding" value="gzip,deflate,sdch" />
-				<entry key="Accept-Language" value="en-US,en;q=0.8" />
-				<entry key="Accept-Charset" value="ISO-8859-1,utf-8;q=0.7,*;q=0.3" />
-				<entry key="Accept" value="application/json, text/javascript, */*" />
-			</map>
-		</property>
+		<property name="headers" ref="headers" />
+		<property name="referer" value="https://dynamic.12306.cn/otsweb/order/querySingleAction.do?method=init" />
 		<property name="loginRandomCodeUrl" value="${loginRandomCodeUrl}" />
 		<property name="loginCodeUrl" value="${loginCodeUrl}" />
-		<property name="loginUrl" value="${loginUrl}" />
+		<property name="loginFormUrl" value="${loginFormUrl}" />
+		<property name="loginMainPageUrl" value="${loginMainPageUrl}" />
 		<property name="randomCodeOpen" value="${randomCodeOpen}" />
 		<property name="randomCodeClose" value="${randomCodeClose}" />
 		<property name="httpClient" ref="httpClient"/>
-	</bean>
-	<!-- <bean id="clientCore" class="com.cxjava.ticket.bean.ClientCore">
-		<property name="params">
+		<property name="staticParameters">
 			<map>
-				<entry key="User-Agent" value="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17" />
-				<entry key="http.socket.timeout">
-					<value type="java.lang.Integer">1000</value>
-				</entry>
-				<entry key="http.connection.timeout">
-					<value type="java.lang.Integer">1000</value>
-				</entry>
-				<entry key="http.connection-manager.timeout">
-					<value type="java.lang.Long">3600</value>
-				</entry>
+				<entry key="refundLogin" value="N" />
+				<entry key="refundFlag" value="Y" />
+				<entry key="nameErrorFocus" value="" />
+				<entry key="passwordErrorFocus" value="" />
+				<entry key="randErrorFocus" value="" />
 			</map>
 		</property>
+		<property name="dynamicParameters">
+			<map>
+				<entry key="loginRand" value="loginRand" />
+				<entry key="loginUser.user_name" value="username" />
+				<entry key="user.password" value="password" />
+				<entry key="randCode" value="captcha" />
+			</map>
+		</property>
+		<property name="username" value="${login.username}" />
+		<property name="password" value="${login.password}" />
+	</bean>
+	<!-- <bean id="clientCore" class="com.cxjava.ticket.bean.ClientCore">
 		<property name="isProxy" value="${isProxy}" />
 		<property name="proxyIp" value="${proxyIp}" />
 		<property name="proxyPort" value="${proxyPort}" />

@@ -59,7 +59,7 @@
 		<property name="version">
 			<util:constant static-field="org.apache.http.HttpVersion.HTTP_1_1" />
 		</property>
-		<property name="userAgent" value="Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.9.1.1) Gecko/20090715 Firefox/17.0.1" />
+		<property name="userAgent" value="${userAgent}" />
 		<property name="contentCharset" value="UTF-8" />
 		<property name="useExpectContinue" value="true" />
 	</bean>
