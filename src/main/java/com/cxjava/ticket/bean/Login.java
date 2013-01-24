@@ -64,9 +64,16 @@ public class Login {
 	private String username;
 	/** 密码 */
 	private String password;
+	/** 是否开启代理 */
+	private String isProxy;
+	/** 代理ip */
+	private String proxyIp;
+	/** 代理端口 */
+	private Integer proxyPort;
 
 	/**
 	 * 真正登录请求
+	 * 
 	 * @return
 	 */
 	public String login() {
@@ -80,7 +87,7 @@ public class Login {
 			String body = IOUtils.toString(
 					new GZIPInputStream(entity.getContent()), "UTF-8");
 			LOG.debug("body : {}.", body);
-			//消息判断
+			// 消息判断
 			if (body.contains("密码修改")) {
 
 			} else if (body.contains("")) {
@@ -89,7 +96,7 @@ public class Login {
 			} else if (body.contains("")) {
 
 			}
-			
+
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
@@ -246,10 +253,12 @@ public class Login {
 	 * @return the httpClient httpClient
 	 */
 	public HttpClient getHttpClient() {
-		HttpHost proxy = new HttpHost("127.0.0.1", 8888,
-				HttpHost.DEFAULT_SCHEME_NAME);
-		this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-				proxy);
+		if ("true".equals(this.getIsProxy())) {
+			HttpHost proxy = new HttpHost(this.getProxyIp(),
+					this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
+			this.httpClient.getParams().setParameter(
+					ConnRoutePNames.DEFAULT_PROXY, proxy);
+		}
 		return httpClient;
 	}
 
@@ -439,6 +448,51 @@ public class Login {
 	 */
 	public void setLoginMainPageUrl(String loginMainPageUrl) {
 		this.loginMainPageUrl = loginMainPageUrl;
+	}
+
+	/**
+	 * @return the isProxy
+	 */
+	public String getIsProxy() {
+		return isProxy;
+	}
+
+	/**
+	 * @param isProxy
+	 *            the isProxy to set
+	 */
+	public void setIsProxy(String isProxy) {
+		this.isProxy = isProxy;
+	}
+
+	/**
+	 * @return the proxyIp
+	 */
+	public String getProxyIp() {
+		return proxyIp;
+	}
+
+	/**
+	 * @param proxyIp
+	 *            the proxyIp to set
+	 */
+	public void setProxyIp(String proxyIp) {
+		this.proxyIp = proxyIp;
+	}
+
+	/**
+	 * @return the proxyPort
+	 */
+	public Integer getProxyPort() {
+		return proxyPort;
+	}
+
+	/**
+	 * @param proxyPort
+	 *            the proxyPort to set
+	 */
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
 	}
 
 }

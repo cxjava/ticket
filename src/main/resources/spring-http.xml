@@ -34,6 +34,9 @@
 		</property>
 		<property name="username" value="${login.username}" />
 		<property name="password" value="${login.password}" />
+		<property name="isProxy" value="${isProxy}" />
+		<property name="proxyIp" value="${proxyIp}" />
+		<property name="proxyPort" value="${proxyPort}" />
 	</bean>
 	<!-- <bean id="clientCore" class="com.cxjava.ticket.bean.ClientCore">
 		<property name="isProxy" value="${isProxy}" />
