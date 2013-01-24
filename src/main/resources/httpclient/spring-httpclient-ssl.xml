@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean id="X509TrustManager" class="org.apache.commons.net.util.TrustManagerUtils" factory-method="getAcceptAllTrustManager" />
+
+	<bean id="sslContext" class="javax.net.ssl.SSLContext" factory-method="getInstance">
+		<constructor-arg type="java.lang.String" value="SSL" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject">
+			<ref local="sslContext" />
+		</property>
+		<property name="targetMethod" value="init" />
+		<property name="arguments">
+			<list>
+				<null />
+				<array>
+					<ref local="X509TrustManager" />
+				</array>
+				<null />
+			</list>
+		</property>
+	</bean>
+
+</beans>

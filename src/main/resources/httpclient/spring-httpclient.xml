@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<bean id="schemeRegistry" class="org.apache.http.conn.scheme.SchemeRegistry" />
+
+	<!-- http client setup -->
+	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory" factory-method="getSocketFactory" />
+
+
+	<!-- https client setup -->
+	<!-- <bean id="sSLSocketFactory" class="org.apache.http.conn.ssl.SSLSocketFactory" factory-method="getSocketFactory" /> -->
+	<bean id="sSLSocketFactory" class="org.apache.http.conn.ssl.SSLSocketFactory">
+		<constructor-arg ref="sslContext" />
+		<property name="hostnameVerifier">
+			<bean class="org.apache.http.conn.ssl.AllowAllHostnameVerifier" />
+		</property>
+	</bean>
+
+	<bean id="scheme-http" class="org.apache.http.conn.scheme.Scheme">
+		<constructor-arg value="http" />
+		<constructor-arg ref="plainSocketFactory" />
+		<constructor-arg type="int" value="80" />
+	</bean>
+
+	<bean id="scheme-https" class="org.apache.http.conn.scheme.Scheme">
+		<constructor-arg value="https" />
+		<constructor-arg ref="sSLSocketFactory" />
+		<constructor-arg type="int" value="443" />
+	</bean>
+
+	<bean id="configuratorSchemeRegistry" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject">
+			<ref local="schemeRegistry" />
+		</property>
+		<property name="targetMethod" value="setItems" />
+		<property name="arguments">
+			<map>
+				<entry key="http" value-ref="scheme-http" />
+				<entry key="https" value-ref="scheme-https" />
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="httpParams" class="org.apache.http.params.BasicHttpParams" />
+
+	<bean class="org.apache.http.params.HttpConnectionParamBean">
+		<constructor-arg ref="httpParams" />
+		<property name="connectionTimeout" value="180000" />
+		<property name="soTimeout" value="120000" />
+		<property name="tcpNoDelay" value="false" />
+		<property name="staleCheckingEnabled" value="false" />
+	</bean>
+
+	<bean class="org.apache.http.params.HttpProtocolParamBean">
+		<constructor-arg ref="httpParams" />
+		<property name="version">
+			<util:constant static-field="org.apache.http.HttpVersion.HTTP_1_1" />
+		</property>
+		<property name="userAgent" value="Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.9.1.1) Gecko/20090715 Firefox/17.0.1" />
+		<property name="contentCharset" value="UTF-8" />
+		<property name="useExpectContinue" value="true" />
+	</bean>
+
+	<bean id="connectionManager" class="org.apache.http.impl.conn.PoolingClientConnectionManager" destroy-method="shutdown">
+		<constructor-arg ref="schemeRegistry" />
+		<property name="maxTotal" value="40" />
+		<property name="defaultMaxPerRoute" value="20" />
+	</bean>
+
+	<bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">
+		<constructor-arg ref="connectionManager" />
+		<constructor-arg ref="httpParams" />
+	</bean>
+
+</beans>
