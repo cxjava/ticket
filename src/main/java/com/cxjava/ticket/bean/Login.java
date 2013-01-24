@@ -235,8 +235,8 @@ public class Login {
 			Map<String, String> dynamic = new HashMap<String, String>();
 			dynamic.put("username", this.getUsername());
 			dynamic.put("password", this.getPassword());
-			dynamic.put("loginRand", this.getRandomCode());
 			dynamic.put("captcha", this.getCaptcha());
+			dynamic.put("loginRand", this.getRandomCode());
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 			// 组装静态参数
 			for (Map.Entry<String, String> entry : this.staticParameters
