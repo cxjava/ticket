@@ -16,6 +16,8 @@
 		<property name="loginMainPageUrl" value="${loginMainPageUrl}" />
 		<property name="randomCodeOpen" value="${randomCodeOpen}" />
 		<property name="randomCodeClose" value="${randomCodeClose}" />
+		<property name="loginInfoOpen" value="${loginInfo.open}" />
+		<property name="loginInfoEnd" value="${loginInfo.end}" />
 		<property name="httpClient" ref="httpClient" />
 		<property name="staticParameters">
 			<map>

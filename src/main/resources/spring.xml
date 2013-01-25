@@ -7,7 +7,6 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<context:property-placeholder
-		ignore-unresolvable="true"
 		location="classpath*:/config.properties,classpath*:/default.properties" />
 
 	<bean id="headers" class="java.util.HashMap">
@@ -20,6 +19,7 @@
 				<entry key="X-Requested-With" value="XMLHttpRequest" />
 				<entry key="Content-Type" value="application/x-www-form-urlencoded" />
 				<entry key="Origin" value="https://dynamic.12306.cn" />
+				<entry key="Host" value="dynamic.12306.cn" />
 			</map>
 		</constructor-arg>
 	</bean>

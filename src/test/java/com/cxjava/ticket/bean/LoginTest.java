@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +21,6 @@ public class LoginTest extends Base {
 
 	@Autowired
 	private Login login;
-
-	@Before
-	public void before() {
-	}
 
 	@Test
 	public void getMainPage() {
@@ -53,7 +48,7 @@ public class LoginTest extends Base {
 	}
 	@Test
 	public void login() {
-		LOG.debug("login.login() : {}", login.login());
+		assertTrue(login.login());
 		//获取个人资料来验证是否登录成功
 		String body=login.doHttpGet("https://dynamic.12306.cn/otsweb/sysuser/editMemberAction.do?method=initEdit");
 		assertTrue(body.contains("手机号码")||body.contains("系统例行维护时间"));

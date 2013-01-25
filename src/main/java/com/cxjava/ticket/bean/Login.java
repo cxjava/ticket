@@ -53,6 +53,10 @@ public class Login {
 	private String randomCodeOpen;
 	/** 截取随机数的后半部分 */
 	private String randomCodeClose;
+	/** 登录信息返回结果截取的开始部分 */
+	private String loginInfoOpen;
+	/** 登录信息返回结果截取的后半部分 */
+	private String loginInfoEnd;
 	/** 引用地址 */
 	private String referer;
 	/** 自定义所有消息头 */
@@ -77,7 +81,9 @@ public class Login {
 	 * 
 	 * @return
 	 */
-	public String login() {
+	public boolean login() {
+		//到主页溜达一圈
+		getMainPage();
 		HttpPost post = new HttpPost(this.loginFormUrl);
 		String result = "";
 		HttpResponse response = null;
@@ -86,26 +92,23 @@ public class Login {
 			post.setEntity(this.addParameters());
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(
-					new GZIPInputStream(entity.getContent()), "UTF-8");
-			LOG.debug("body : {}.", body);
+			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			LOG.debug("login body : {}.", body);
 			// 消息判断
+			result = StringUtils.substringBetween(body, loginInfoOpen, loginInfoEnd);
 			if (body.contains("密码修改")) {
-
-			} else if (body.contains("")) {
-			} else if (body.contains("")) {
-			} else if (body.contains("")) {
-			} else if (body.contains("")) {
-
+				return true;
+			} else {
+				LOG.info("登录失败消息 : {}", result);
+				return false;
 			}
-
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
 			HttpClientUtils.closeQuietly(response);
 			post.releaseConnection();
 		}
-		return result;
+		return false;
 	}
 
 	/**
@@ -119,9 +122,8 @@ public class Login {
 			addHeader(get);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			body = IOUtils.toString(new GZIPInputStream(entity.getContent()),
-					"UTF-8");
-			LOG.debug("{} : {}.", url, body);
+			body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			LOG.debug("doHttpGet {} : {}.", url, body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
@@ -141,9 +143,8 @@ public class Login {
 			addHeader(get);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(
-					new GZIPInputStream(entity.getContent()), "UTF-8");
-			LOG.debug("body : {}.", body);
+			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			LOG.debug("getMainPage body : {}.", body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
@@ -166,9 +167,10 @@ public class Login {
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(entity.getContent(), "UTF-8");
-			LOG.debug("body : {}.", body);
-			return StringUtils.substringBetween(body, randomCodeOpen,
-					randomCodeClose);
+			LOG.debug("getRandomCode body : {}.", body);
+			body = StringUtils.substringBetween(body, randomCodeOpen, randomCodeClose);
+			LOG.info("随机数为 : {}", body);
+			return body;
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
@@ -186,7 +188,10 @@ public class Login {
 	public String getCaptcha() {
 		HttpGet get = new HttpGet(this.loginCodeUrl);
 		String captcha = "";
-		String savePath = "F:\\Downloads\\12306\\";
+
+		// String savePath = "F:\\Downloads\\12306\\";
+		String savePath = "D:\\05_Document\\Downloads\\12306\\";
+
 		HttpResponse response = null;
 		try {
 			addHeader(get);
@@ -196,7 +201,7 @@ public class Login {
 			BufferedImage bufferedImage = ImageIO.read(inputStream);
 			// 识别验证码
 			captcha = OCR.imageToString(bufferedImage);
-			LOG.debug("captcha : {}.", captcha);
+			LOG.info("验证码 : {}.", captcha);
 
 			// test
 			File file = new File(savePath + captcha + ".jpg");
@@ -239,21 +244,16 @@ public class Login {
 			dynamic.put("loginRand", this.getRandomCode());
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 			// 组装静态参数
-			for (Map.Entry<String, String> entry : this.staticParameters
-					.entrySet()) {
-				parameters.add(new BasicNameValuePair(entry.getKey(), entry
-						.getValue()));
+			for (Map.Entry<String, String> entry : this.staticParameters.entrySet()) {
+				parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 			// 组装动态参数
-			for (Map.Entry<String, String> entry : this.dynamicParameters
-					.entrySet()) {
+			for (Map.Entry<String, String> entry : this.dynamicParameters.entrySet()) {
 				// 参数名称可以动态修改
-				parameters.add(new BasicNameValuePair(entry.getKey(), dynamic
-						.get(entry.getValue())));
+				parameters.add(new BasicNameValuePair(entry.getKey(), dynamic.get(entry.getValue())));
 			}
 
-			return new UrlEncodedFormEntity(parameters,
-					HTTP.DEF_PROTOCOL_CHARSET.name());
+			return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		}
@@ -265,10 +265,8 @@ public class Login {
 	 */
 	public HttpClient getHttpClient() {
 		if ("true".equals(this.getIsProxy())) {
-			HttpHost proxy = new HttpHost(this.getProxyIp(),
-					this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
-			this.httpClient.getParams().setParameter(
-					ConnRoutePNames.DEFAULT_PROXY, proxy);
+			HttpHost proxy = new HttpHost(this.getProxyIp(), this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
+			this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		}
 		return httpClient;
 	}
@@ -312,6 +310,81 @@ public class Login {
 	}
 
 	/**
+	 * @return the loginFormUrl 登录表单提交地址
+	 */
+	public String getLoginFormUrl() {
+		return loginFormUrl;
+	}
+
+	/**
+	 * @param loginFormUrl
+	 *            the loginFormUrl to set 登录表单提交地址
+	 */
+	public void setLoginFormUrl(String loginFormUrl) {
+		this.loginFormUrl = loginFormUrl;
+	}
+
+	/**
+	 * @return the loginMainPageUrl 登录首页地址
+	 */
+	public String getLoginMainPageUrl() {
+		return loginMainPageUrl;
+	}
+
+	/**
+	 * @param loginMainPageUrl
+	 *            the loginMainPageUrl to set 登录首页地址
+	 */
+	public void setLoginMainPageUrl(String loginMainPageUrl) {
+		this.loginMainPageUrl = loginMainPageUrl;
+	}
+
+	/**
+	 * @return the randomCodeOpen 截取随机数的前半部分
+	 */
+	public String getRandomCodeOpen() {
+		return randomCodeOpen;
+	}
+
+	/**
+	 * @param randomCodeOpen
+	 *            the randomCodeOpen to set 截取随机数的前半部分
+	 */
+	public void setRandomCodeOpen(String randomCodeOpen) {
+		this.randomCodeOpen = randomCodeOpen;
+	}
+
+	/**
+	 * @return the randomCodeClose 截取随机数的后半部分
+	 */
+	public String getRandomCodeClose() {
+		return randomCodeClose;
+	}
+
+	/**
+	 * @param randomCodeClose
+	 *            the randomCodeClose to set 截取随机数的后半部分
+	 */
+	public void setRandomCodeClose(String randomCodeClose) {
+		this.randomCodeClose = randomCodeClose;
+	}
+
+	/**
+	 * @return the referer 引用地址
+	 */
+	public String getReferer() {
+		return referer;
+	}
+
+	/**
+	 * @param referer
+	 *            the referer to set 引用地址
+	 */
+	public void setReferer(String referer) {
+		this.referer = referer;
+	}
+
+	/**
 	 * @return the headers 自定义所有消息头
 	 */
 	public HashMap<String, String> getHeaders() {
@@ -327,52 +400,7 @@ public class Login {
 	}
 
 	/**
-	 * @return the randomCodeOpen
-	 */
-	public String getRandomCodeOpen() {
-		return randomCodeOpen;
-	}
-
-	/**
-	 * @param randomCodeOpen
-	 *            the randomCodeOpen to set
-	 */
-	public void setRandomCodeOpen(String randomCodeOpen) {
-		this.randomCodeOpen = randomCodeOpen;
-	}
-
-	/**
-	 * @return the randomCodeClose
-	 */
-	public String getRandomCodeClose() {
-		return randomCodeClose;
-	}
-
-	/**
-	 * @param randomCodeClose
-	 *            the randomCodeClose to set
-	 */
-	public void setRandomCodeClose(String randomCodeClose) {
-		this.randomCodeClose = randomCodeClose;
-	}
-
-	/**
-	 * @return the referer
-	 */
-	public String getReferer() {
-		return referer;
-	}
-
-	/**
-	 * @param referer
-	 *            the referer to set
-	 */
-	public void setReferer(String referer) {
-		this.referer = referer;
-	}
-
-	/**
-	 * @return the staticParameters
+	 * @return the staticParameters 静态提交参数
 	 */
 	public HashMap<String, String> getStaticParameters() {
 		return staticParameters;
@@ -380,14 +408,14 @@ public class Login {
 
 	/**
 	 * @param staticParameters
-	 *            the staticParameters to set
+	 *            the staticParameters to set 静态提交参数
 	 */
 	public void setStaticParameters(HashMap<String, String> staticParameters) {
 		this.staticParameters = staticParameters;
 	}
 
 	/**
-	 * @return the dynamicParameters
+	 * @return the dynamicParameters 动态提交参数
 	 */
 	public HashMap<String, String> getDynamicParameters() {
 		return dynamicParameters;
@@ -395,14 +423,14 @@ public class Login {
 
 	/**
 	 * @param dynamicParameters
-	 *            the dynamicParameters to set
+	 *            the dynamicParameters to set 动态提交参数
 	 */
 	public void setDynamicParameters(HashMap<String, String> dynamicParameters) {
 		this.dynamicParameters = dynamicParameters;
 	}
 
 	/**
-	 * @return the username
+	 * @return the username 用户名
 	 */
 	public String getUsername() {
 		return username;
@@ -410,14 +438,14 @@ public class Login {
 
 	/**
 	 * @param username
-	 *            the username to set
+	 *            the username to set 用户名
 	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
 	/**
-	 * @return the password
+	 * @return the password 密码
 	 */
 	public String getPassword() {
 		return password;
@@ -425,44 +453,14 @@ public class Login {
 
 	/**
 	 * @param password
-	 *            the password to set
+	 *            the password to set 密码
 	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
 	/**
-	 * @return the loginFormUrl
-	 */
-	public String getLoginFormUrl() {
-		return loginFormUrl;
-	}
-
-	/**
-	 * @param loginFormUrl
-	 *            the loginFormUrl to set
-	 */
-	public void setLoginFormUrl(String loginFormUrl) {
-		this.loginFormUrl = loginFormUrl;
-	}
-
-	/**
-	 * @return the loginMainPageUrl
-	 */
-	public String getLoginMainPageUrl() {
-		return loginMainPageUrl;
-	}
-
-	/**
-	 * @param loginMainPageUrl
-	 *            the loginMainPageUrl to set
-	 */
-	public void setLoginMainPageUrl(String loginMainPageUrl) {
-		this.loginMainPageUrl = loginMainPageUrl;
-	}
-
-	/**
-	 * @return the isProxy
+	 * @return the isProxy 是否开启代理
 	 */
 	public String getIsProxy() {
 		return isProxy;
@@ -470,14 +468,14 @@ public class Login {
 
 	/**
 	 * @param isProxy
-	 *            the isProxy to set
+	 *            the isProxy to set 是否开启代理
 	 */
 	public void setIsProxy(String isProxy) {
 		this.isProxy = isProxy;
 	}
 
 	/**
-	 * @return the proxyIp
+	 * @return the proxyIp 代理ip
 	 */
 	public String getProxyIp() {
 		return proxyIp;
@@ -485,14 +483,14 @@ public class Login {
 
 	/**
 	 * @param proxyIp
-	 *            the proxyIp to set
+	 *            the proxyIp to set 代理ip
 	 */
 	public void setProxyIp(String proxyIp) {
 		this.proxyIp = proxyIp;
 	}
 
 	/**
-	 * @return the proxyPort
+	 * @return the proxyPort 代理端口
 	 */
 	public Integer getProxyPort() {
 		return proxyPort;
@@ -500,10 +498,40 @@ public class Login {
 
 	/**
 	 * @param proxyPort
-	 *            the proxyPort to set
+	 *            the proxyPort to set 代理端口
 	 */
 	public void setProxyPort(Integer proxyPort) {
 		this.proxyPort = proxyPort;
+	}
+
+	/**
+	 * @return the loginInfoOpen 登录信息返回结果截取的开始部分
+	 */
+	public String getLoginInfoOpen() {
+		return loginInfoOpen;
+	}
+
+	/**
+	 * @param loginInfoOpen
+	 *            the loginInfoOpen to set 登录信息返回结果截取的开始部分
+	 */
+	public void setLoginInfoOpen(String loginInfoOpen) {
+		this.loginInfoOpen = loginInfoOpen;
+	}
+
+	/**
+	 * @return the loginInfoEnd 登录信息返回结果截取的后半部分
+	 */
+	public String getLoginInfoEnd() {
+		return loginInfoEnd;
+	}
+
+	/**
+	 * @param loginInfoEnd
+	 *            the loginInfoEnd to set 登录信息返回结果截取的后半部分
+	 */
+	public void setLoginInfoEnd(String loginInfoEnd) {
+		this.loginInfoEnd = loginInfoEnd;
 	}
 
 }
