@@ -19,15 +19,12 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -214,10 +211,6 @@ public class Query {
 	public String getCaptcha() {
 		HttpGet get = new HttpGet(this.orderCodeUrl);
 		String captcha = "";
-
-		// String savePath = "F:\\Downloads\\12306\\";
-		String savePath = "D:\\05_Document\\Downloads\\12306\\";
-
 		HttpResponse response = null;
 		try {
 			addHeader(get, this.confirmReferer);
@@ -228,12 +221,6 @@ public class Query {
 			// 识别验证码
 			captcha = OCR.imageToString(bufferedImage);
 			LOG.info("验证码 : {}.", captcha);
-
-			// test
-			File file = new File(savePath + captcha + ".jpg");
-			ImageIO.write(bufferedImage, "jpg", file);
-			// test
-
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {

@@ -1,7 +1,6 @@
 package com.cxjava.ticket.bean;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -188,10 +187,6 @@ public class Login {
 	public String getCaptcha() {
 		HttpGet get = new HttpGet(this.loginCodeUrl);
 		String captcha = "";
-
-		// String savePath = "F:\\Downloads\\12306\\";
-		String savePath = "D:\\05_Document\\Downloads\\12306\\";
-
 		HttpResponse response = null;
 		try {
 			addHeader(get);
@@ -202,11 +197,6 @@ public class Login {
 			// 识别验证码
 			captcha = OCR.imageToString(bufferedImage);
 			LOG.info("验证码 : {}.", captcha);
-
-			// test
-			File file = new File(savePath + captcha + ".jpg");
-			ImageIO.write(bufferedImage, "jpg", file);
-			// test
 
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
