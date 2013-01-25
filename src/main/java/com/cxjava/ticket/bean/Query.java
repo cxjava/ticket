@@ -103,10 +103,10 @@ public class Query {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8").replaceAll("&nbsp;", "");
 			LOG.debug("querySingleAction body : {}.", body);
 			Document doc = Jsoup.parse(body);
-			LOG.debug("doc.ownText() : {}.", doc.ownText());
+			LOG.debug("doc.text() : {}.", doc.text());
 			
 			body = StringUtils.substringBetween(body, "'onStopOut()'>"+"L1034", "订</a>");
 			LOG.debug("body : {}.", body);
