@@ -92,6 +92,7 @@ public class Login {
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+//			String body = IOUtils.toString(entity.getContent(), "UTF-8");
 			LOG.debug("login body : {}.", body);
 			// 消息判断
 			result = StringUtils.substringBetween(body, loginInfoOpen, loginInfoEnd);
@@ -143,6 +144,7 @@ public class Login {
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+//			String body = IOUtils.toString(entity.getContent(), "UTF-8");
 			LOG.debug("getMainPage body : {}.", body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);

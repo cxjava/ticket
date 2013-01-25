@@ -17,17 +17,18 @@
 			</map>
 		</property>
 		<property name="seatNameMap">
+			<!-- 商务3,特等4,一等5,二等6,高软7,软卧8,硬卧9,软座10,硬座11,无座12,其他13 -->
 			<map>
-				<entry key="9" value="商务座" />
-				<entry key="p" value="特等座" />
-				<entry key="M" value="一等座" />
-				<entry key="O" value="二等座" />
-				<entry key="6" value="高级软卧" />
-				<entry key="4" value="软卧" />
-				<entry key="3" value="硬卧" />
-				<entry key="2" value="软座" />
-				<entry key="1" value="硬座" />
-				<entry key="-1" value="无座" />
+				<entry key="3" value="9" /><!-- 商务座 -->
+				<entry key="4" value="p" /><!-- 特等座 -->
+				<entry key="5" value="M" /><!-- 一等座 -->
+				<entry key="6" value="O" /><!-- 二等座 -->
+				<entry key="7" value="6" /><!-- 高级软卧 -->
+				<entry key="8" value="4" /><!-- 软卧 -->
+				<entry key="9" value="3" /><!-- 硬卧 -->
+				<entry key="10" value="2" /><!-- 软座 -->
+				<entry key="11" value="1" /><!-- 硬座 -->
+				<entry key="12" value="-1" /><!-- 无座 -->
 			</map>
 		</property>
 		<property name="trainPriorityMap">
@@ -76,5 +77,5 @@
 		</property>
 	</bean>
 
-	
+
 </beans>

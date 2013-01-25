@@ -26,6 +26,7 @@ public class QueryTest extends Base {
 	@Before
 	public void before() {
 		assertTrue(login.login());
+//		login.login();
 		query.getQueryPage();
 	}
 
@@ -38,10 +39,17 @@ public class QueryTest extends Base {
 	@Test
 	public void getStationName() {
 		assertNotNull(query.getStationName());
+		assertNotNull(query.getStationNameStatic());
 	}
 	@Test
 	public void querySingleAction() {
 		assertNotNull(query.querySingleAction());
+	}
+	@Test
+	public void submutOrder() {
+		String info=query.querySingleAction();
+		assertNotNull(info);
+		query.submutOrder(info);
 	}
 
 }

@@ -27,6 +27,8 @@
 		<property name="toStation" value="${toStation}" />
 		<property name="trainDate" value="${trainDate}" />
 		<property name="citys" value="${citys}" />
+		<property name="trainCode" value="${trainCode}" />
+		<property name="seatType" value="${seatType}" />
 		<property name="queryStaticParameters">
 			<map>
 				<entry key="method" value="queryLeftTicket" />
@@ -43,6 +45,43 @@
 				<entry key="orderRequest.start_time_str" value="goTime" />
 				<entry key="orderRequest.to_station_telecode" value="toStation" />
 				<entry key="orderRequest.train_date" value="trainDate" />
+			</map>
+		</property>
+		<property name="confirmStaticParameters">
+			<map>
+				<entry key="seattype_num" value="" />
+				<entry key="include_student" value="00" />
+				<entry key="single_round_type" value="1" />
+				<entry key="train_pass_type" value="QB" />
+				<entry key="train_class_arr" value="QB#D#Z#T#K#QT#" />
+			</map>
+		</property>
+		<property name="confirmMapDynamicParameters">
+			<map>
+				<entry key="train_date" value="trainDate" />
+				<entry key="from_station_telecode" value="fromStationCode" />
+				<entry key="to_station_telecode" value="toStationCode" />
+				<entry key="from_station_telecode_name" value="fromStation" />
+				<entry key="to_station_telecode_name" value="toStation" />
+				<entry key="round_train_date" value="trainDate" />
+				<entry key="round_start_time_str" value="goTime" />
+				<entry key="start_time_str" value="goTime" />
+			</map>
+		</property>
+		<property name="confirmArrayDynamicParameters">
+			<map>
+				<entry key="station_train_code" value="0" />
+				<entry key="lishi" value="1" />
+				<entry key="train_start_time" value="2" />
+				<entry key="trainno4" value="3" />
+				<entry key="arrive_time" value="6" />
+				<entry key="from_station_name" value="7" />
+				<entry key="to_station_name" value="8" />
+				<entry key="from_station_no" value="9" />
+				<entry key="to_station_no" value="10" />
+				<entry key="ypInfoDetail" value="11" />
+				<entry key="mmStr" value="12" />
+				<entry key="locationCode" value="13" />
 			</map>
 		</property>
 	</bean>
