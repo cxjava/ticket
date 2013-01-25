@@ -28,6 +28,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +87,8 @@ public class Query {
 	private String toStation;
 	/** 出发日期 */
 	private String trainDate;
+	/** 车站信息 */
+	private String citys;
 
 	/**
 	 * 查询车票信息
@@ -92,16 +96,21 @@ public class Query {
 	 * @return
 	 */
 	public String querySingleAction() {
-		HttpGet get = new HttpGet(this.queryFormUrl+this.addQueryParameters());
+		HttpGet get = new HttpGet(this.queryFormUrl + this.addQueryParameters());
 		String result = "";
 		HttpResponse response = null;
 		try {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(entity.getContent(), "UTF-8");
+			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
 			LOG.debug("querySingleAction body : {}.", body);
-
+			Document doc = Jsoup.parse(body);
+			LOG.debug("doc.ownText() : {}.", doc.ownText());
+			
+			body = StringUtils.substringBetween(body, "'onStopOut()'>"+"L1034", "订</a>");
+			LOG.debug("body : {}.", body);
+			
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		} finally {
@@ -182,6 +191,20 @@ public class Query {
 		}
 		return cityMap;
 	}
+	/**
+	 * 获取车站代码，静态的
+	 */
+	public Map<String, String> getStationNameStatic() {
+		Map<String, String> cityMap = new HashMap<String, String>();
+		for (String temp : citys.split("@")) {
+			if (StringUtils.isNotBlank(temp)) {
+				String[] name = temp.split("\\|");
+				cityMap.put(name[1], name[2]);
+			}
+		}
+		LOG.debug("getStationName cityMap : {}.", cityMap);
+		return cityMap;
+	}
 
 	/**
 	 * 获取验证码
@@ -241,7 +264,12 @@ public class Query {
 	private String addQueryParameters() {
 		try {
 			// 获取最新车站信息
-			Map<String, String> cityMap = getStationName();
+//			Map<String, String> cityMap = getStationName();
+			Map<String, String> cityMap = getStationNameStatic();
+			LOG.debug("(fromStation) : {}.", fromStation);
+			LOG.debug("(toStation) : {}.", toStation);
+			LOG.debug("cityMap.get(fromStation) : {}.", cityMap.get(fromStation));
+			LOG.debug("cityMap.get(toStation) : {}.", cityMap.get(toStation));
 			Map<String, String> dynamic = new HashMap<String, String>();
 			dynamic.put("fromStation", cityMap.get(fromStation));
 			if (StringUtils.isNotBlank(this.goTime)) {
@@ -600,6 +628,21 @@ public class Query {
 	 */
 	public void setTrainDate(String trainDate) {
 		this.trainDate = trainDate;
+	}
+
+	/**
+	 * @return the citys 车站信息
+	 */
+	public String getCitys() {
+		return citys;
+	}
+
+	/**
+	 * @param citys
+	 *            the citys to set 车站信息
+	 */
+	public void setCitys(String citys) {
+		this.citys = citys;
 	}
 
 }
