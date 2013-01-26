@@ -23,20 +23,21 @@ import com.cxjava.ticket.ocr.OCR;
 public class OCRTest {
 	private static final Logger LOG = LoggerFactory.getLogger(OCRTest.class);
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
-	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+	private static String SAVE_PATH = "f:\\Downloads\\12306\\";
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		try {
-			for (int i = 1; i < 51; i++) {
-				InputStream input = new URL(URL).openStream();
+			for (int i = 1; i < 111; i++) {
+				InputStream input = new URL(URL+"&"+Math.random()).openStream();
 				BufferedImage bufferedImage = ImageIO.read(input);
 				String code = OCR.imageToString(bufferedImage);
 				LOG.debug("code : {}.", code);
-				File file = new File(SAVE_PATH + code + ".jpg");
-				ImageIO.write(bufferedImage, "jpg", file);
+				File file = new File(SAVE_PATH + i + ".png");
+				ImageIO.write(bufferedImage, "png", file);
 			}
 		} catch (IOException e) {
 			LOG.error("e : {}.", e);

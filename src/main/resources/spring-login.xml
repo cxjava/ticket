@@ -20,20 +20,20 @@
 		<property name="loginInfoEnd" value="${loginInfo.end}" />
 		<property name="httpClient" ref="httpClient" />
 		<property name="staticParameters">
-			<map>
-				<entry key="refundLogin" value="N" />
-				<entry key="refundFlag" value="Y" />
-				<entry key="nameErrorFocus" value="" />
-				<entry key="passwordErrorFocus" value="" />
-				<entry key="randErrorFocus" value="" />
+			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
+				<entry key="12#refundLogin" value="N" />
+				<entry key="13#refundFlag" value="Y" />
+				<entry key="15#nameErrorFocus" value="" />
+				<entry key="17#passwordErrorFocus" value="" />
+				<entry key="19#randErrorFocus" value="" />
 			</map>
 		</property>
 		<property name="dynamicParameters">
 			<map>
-				<entry key="loginRand" value="loginRand" />
-				<entry key="loginUser.user_name" value="username" />
-				<entry key="user.password" value="password" />
-				<entry key="randCode" value="captcha" />
+				<entry key="11#loginRand" value="loginRand" />
+				<entry key="14#loginUser.user_name" value="username" />
+				<entry key="16#user.password" value="password" />
+				<entry key="18#randCode" value="captcha" />
 			</map>
 		</property>
 		<property name="username" value="${login.username}" />

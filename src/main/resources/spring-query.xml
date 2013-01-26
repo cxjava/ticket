@@ -29,59 +29,61 @@
 		<property name="citys" value="${citys}" />
 		<property name="trainCode" value="${trainCode}" />
 		<property name="seatType" value="${seatType}" />
+		<property name="loginInfoOpen" value="${loginInfo.open}" />
+		<property name="loginInfoEnd" value="${loginInfo.end}" />
 		<property name="queryStaticParameters">
-			<map>
-				<entry key="method" value="queryLeftTicket" />
-				<entry key="includeStudent" value="00" />
-				<entry key="orderRequest.train_no" value="" />
-				<entry key="seatTypeAndNum" value="" />
-				<entry key="trainClass" value="QB#D#Z#T#K#QT#" />
-				<entry key="trainPassType" value="QB" />
+			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
+				<entry key="11#method" value="queryLeftTicket" />
+				<entry key="15#orderRequest.train_no" value="" />
+				<entry key="16#trainPassType" value="QB" />
+				<entry key="17#trainClass" value="QB#D#Z#T#K#QT#" />
+				<entry key="18#includeStudent" value="00" />
+				<entry key="19#seatTypeAndNum" value="" />
 			</map>
 		</property>
 		<property name="queryDynamicParameters">
 			<map>
-				<entry key="orderRequest.from_station_telecode" value="fromStation" />
-				<entry key="orderRequest.start_time_str" value="goTime" />
-				<entry key="orderRequest.to_station_telecode" value="toStation" />
-				<entry key="orderRequest.train_date" value="trainDate" />
+				<entry key="12#orderRequest.train_date" value="trainDate" />
+				<entry key="13#orderRequest.from_station_telecode" value="fromStation" />
+				<entry key="14#orderRequest.to_station_telecode" value="toStation" />
+				<entry key="20#orderRequest.start_time_str" value="goTime" />
 			</map>
 		</property>
 		<property name="confirmStaticParameters">
-			<map>
-				<entry key="seattype_num" value="" />
-				<entry key="include_student" value="00" />
-				<entry key="single_round_type" value="1" />
-				<entry key="train_pass_type" value="QB" />
-				<entry key="train_class_arr" value="QB#D#Z#T#K#QT#" />
+			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
+				<entry key="13#seattype_num" value="" />
+				<entry key="21#single_round_type" value="1" />
+				<entry key="22#train_pass_type" value="QB" />
+				<entry key="23#train_class_arr" value="QB#D#Z#T#K#QT#" />
+				<entry key="16#include_student" value="00" />
 			</map>
 		</property>
 		<property name="confirmMapDynamicParameters">
 			<map>
-				<entry key="train_date" value="trainDate" />
-				<entry key="from_station_telecode" value="fromStationCode" />
-				<entry key="to_station_telecode" value="toStationCode" />
-				<entry key="from_station_telecode_name" value="fromStation" />
-				<entry key="to_station_telecode_name" value="toStation" />
-				<entry key="round_train_date" value="trainDate" />
-				<entry key="round_start_time_str" value="goTime" />
-				<entry key="start_time_str" value="goTime" />
+				<entry key="12#train_date" value="trainDate" />
+				<entry key="14#from_station_telecode" value="fromStationCode" />
+				<entry key="15#to_station_telecode" value="toStationCode" />
+				<entry key="17#from_station_telecode_name" value="fromStation" />
+				<entry key="18#to_station_telecode_name" value="toStation" />
+				<entry key="19#round_train_date" value="trainDate" />
+				<entry key="20#round_start_time_str" value="goTime" />
+				<entry key="24#start_time_str" value="goTime" />
 			</map>
 		</property>
 		<property name="confirmArrayDynamicParameters">
 			<map>
-				<entry key="station_train_code" value="0" />
-				<entry key="lishi" value="1" />
-				<entry key="train_start_time" value="2" />
-				<entry key="trainno4" value="3" />
-				<entry key="arrive_time" value="6" />
-				<entry key="from_station_name" value="7" />
-				<entry key="to_station_name" value="8" />
-				<entry key="from_station_no" value="9" />
-				<entry key="to_station_no" value="10" />
-				<entry key="ypInfoDetail" value="11" />
-				<entry key="mmStr" value="12" />
-				<entry key="locationCode" value="13" />
+				<entry key="11#station_train_code" value="1" />
+				<entry key="25#lishi" value="2" />
+				<entry key="26#train_start_time" value="3" />
+				<entry key="27#trainno4" value="4" />
+				<entry key="28#arrive_time" value="7" />
+				<entry key="29#from_station_name" value="8" />
+				<entry key="30#to_station_name" value="9" />
+				<entry key="31#from_station_no" value="10" />
+				<entry key="32#to_station_no" value="11" />
+				<entry key="33#ypInfoDetail" value="12" />
+				<entry key="34#mmStr" value="13" />
+				<entry key="35#locationCode" value="14" />
 			</map>
 		</property>
 	</bean>

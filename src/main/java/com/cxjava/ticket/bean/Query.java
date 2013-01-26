@@ -1,6 +1,7 @@
 package com.cxjava.ticket.bean;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -27,7 +29,6 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -100,12 +101,16 @@ public class Query {
 	private String trainCode;
 	/** 席别类型 */
 	private String seatType;
+	/** 信息返回结果截取的开始部分 */
+	private String loginInfoOpen;
+	/** 信息返回结果截取的后半部分 */
+	private String loginInfoEnd;
 	/**
 	 * 提交车票订单
 	 * @return
 	 */
 	public boolean submutOrder(String info) {
-		HttpPost post = new HttpPost(this.queryFormUrl);
+		HttpPost post = new HttpPost(this.submitOrderRequestUrl);
 		String result = "";
 		HttpResponse response = null;
 		try {
@@ -113,11 +118,18 @@ public class Query {
 			post.setEntity(this.addConfirmParameters(info));
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("submutOrder body : {}.", body);
+			result = StringUtils.substringBetween(body, loginInfoOpen, loginInfoEnd);
 			// 消息判断
-//			result = StringUtils.substringBetween(body, loginInfoOpen, loginInfoEnd);
-			if (body.contains("密码修改")) {
+			if (body.contains("常用联系人加载中，请稍候...")) {
+				LOG.info("常用联系人加载中，请稍候...");
+				Document doc = Jsoup.parse(body);
+				String TOKEN = doc.select("input[name='org.apache.struts.taglib.html.TOKEN']").attr("value");
+				String leftTicketStr = doc.select("input[name='leftTicketStr']").attr("value");
+				LOG.info("TOKEN：{}",TOKEN);
+				LOG.info("leftTicketStr：{}",leftTicketStr);
+				
 				return true;
 			} else {
 				LOG.info("登录失败消息 : {}", result);
@@ -143,8 +155,7 @@ public class Query {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8").replaceAll("&nbsp;", "");
-//			String body = IOUtils.toString(entity.getContent(), "UTF-8").replaceAll("&nbsp;", "");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8").replaceAll("&nbsp;", "");
 			LOG.debug("querySingleAction body : {}.", body);
 			Document doc = Jsoup.parse(body);
 			String text = doc.text();
@@ -174,8 +185,7 @@ public class Query {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			body = IOUtils.toString(new GZIPInputStream(entity.getContent()),
-					"UTF-8");
+			body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("doHttpGet {} : {}.", url, body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -196,8 +206,7 @@ public class Query {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
-//			String body = IOUtils.toString(entity.getContent(), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("getQueryPage body : {}.", body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -219,7 +228,7 @@ public class Query {
 			addHeader(get, this.queryReferer);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("getStationName body : {}.", body);
 			body = StringUtils.substringBetween(body, this.stationOpen,
 					this.stationEnd);
@@ -349,29 +358,32 @@ public class Query {
 			// 获取最新车站信息
 			Map<String, String> cityMap = getStationName();
 //			Map<String, String> cityMap = getStationNameStatic();
+			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			Map<String, String> tree = new TreeMap<String, String>();
+			//放入静态参数
+			tree.putAll(this.queryStaticParameters);
 			Map<String, String> dynamic = new HashMap<String, String>();
+			dynamic.put("trainDate", this.trainDate);
 			if (StringUtils.isNotBlank(this.goTime)) {
 				dynamic.put("goTime", this.goTime);
 			} else {
 				dynamic.put("goTime", "00:00--24:00");
 			}
-			dynamic.put("trainDate", this.trainDate);
 			dynamic.put("fromStation", cityMap.get(fromStation));
 			dynamic.put("toStation", cityMap.get(toStation));
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-			// 组装静态参数
-			for (Map.Entry<String, String> entry : this.queryStaticParameters
-					.entrySet()) {
-				parameters.add(new BasicNameValuePair(entry.getKey(), entry
+			// 组装动态参数
+			for (Map.Entry<String, String> entry : this.queryDynamicParameters.entrySet()) {
+				// 参数名称可以动态修改
+				tree.put(entry.getKey(), dynamic.get(entry.getValue()));
+			}
+			// 组装排序后的参数
+			for (Map.Entry<String, String> entry : tree.entrySet()) {
+				//去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
 						.getValue()));
 			}
-			// 组装动态参数
-			for (Map.Entry<String, String> entry : this.queryDynamicParameters
-					.entrySet()) {
-				// 参数名称可以动态修改
-				parameters.add(new BasicNameValuePair(entry.getKey(), dynamic
-						.get(entry.getValue())));
-			}
+			
 			return URLEncodedUtils.format(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -388,6 +400,11 @@ public class Query {
 			// 获取最新车站信息
 			 Map<String, String> cityMap = getStationName();
 //			Map<String, String> cityMap = getStationNameStatic();
+			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			Map<String, String> tree = new TreeMap<String, String>();
+			//放入静态参数
+			tree.putAll(this.confirmStaticParameters);
+			
 			Map<String, String> dynamic = new HashMap<String, String>();
 			if (StringUtils.isNotBlank(this.goTime)) {
 				dynamic.put("goTime", this.goTime);
@@ -400,18 +417,11 @@ public class Query {
 			dynamic.put("fromStation", fromStation);
 			dynamic.put("toStation", toStation);
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-			// 组装静态参数
-			for (Map.Entry<String, String> entry : this.confirmStaticParameters
-					.entrySet()) {
-				parameters.add(new BasicNameValuePair(entry.getKey(), entry
-						.getValue()));
-			}
 			// 组装动态参数
 			for (Map.Entry<String, String> entry : this.confirmMapDynamicParameters
 					.entrySet()) {
 				// 参数名称可以动态修改
-				parameters.add(new BasicNameValuePair(entry.getKey(), dynamic
-						.get(entry.getValue())));
+				tree.put(entry.getKey(), dynamic.get(entry.getValue()));
 			}
 			if(StringUtils.isNotBlank(info)){
 				LOG.debug("info:{}",info);
@@ -420,16 +430,34 @@ public class Query {
 						.entrySet()) {
 					// 参数名称可以动态修改
 					int index=Integer.valueOf(entry.getValue());
-					parameters.add(new BasicNameValuePair(entry.getKey(), arrays[index]));
+					tree.put(entry.getKey(), arrays[index]);
 				}
 			}
-			return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
+			// 组装排序后的参数
+			for (Map.Entry<String, String> entry : tree.entrySet()) {
+				//去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
+						.getValue()));
+			}
+			return new UrlEncodedFormEntity(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		}
 		return null;
 	}
-
+	private static InputStream getInputStream(HttpEntity entity)
+			throws IOException {
+		Header encoding = entity.getContentEncoding();
+		if (encoding != null) {
+			if (encoding.getValue().equals("gzip")
+					|| encoding.getValue().equals("zip")
+					|| encoding.getValue().equals(
+							"application/x-gzip-compressed")) {
+				return new GZIPInputStream(entity.getContent());
+			}
+		}
+		return entity.getContent();
+	}
 	/**
 	 * @return the httpClient httpClient
 	 */
@@ -856,6 +884,30 @@ public class Query {
 	public void setConfirmArrayDynamicParameters(
 			HashMap<String, String> confirmArrayDynamicParameters) {
 		this.confirmArrayDynamicParameters = confirmArrayDynamicParameters;
+	}
+	/**
+	 * @return the loginInfoOpen
+	 */
+	public String getLoginInfoOpen() {
+		return loginInfoOpen;
+	}
+	/**
+	 * @param loginInfoOpen the loginInfoOpen to set
+	 */
+	public void setLoginInfoOpen(String loginInfoOpen) {
+		this.loginInfoOpen = loginInfoOpen;
+	}
+	/**
+	 * @return the loginInfoEnd
+	 */
+	public String getLoginInfoEnd() {
+		return loginInfoEnd;
+	}
+	/**
+	 * @param loginInfoEnd the loginInfoEnd to set
+	 */
+	public void setLoginInfoEnd(String loginInfoEnd) {
+		this.loginInfoEnd = loginInfoEnd;
 	}
 
 }

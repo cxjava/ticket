@@ -1,17 +1,21 @@
 package com.cxjava.ticket.bean;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -23,8 +27,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,8 +97,7 @@ public class Login {
 			post.setEntity(this.addParameters());
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
-//			String body = IOUtils.toString(entity.getContent(), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("login body : {}.", body);
 			// 消息判断
 			result = StringUtils.substringBetween(body, loginInfoOpen, loginInfoEnd);
@@ -122,7 +127,7 @@ public class Login {
 			addHeader(get);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
+			body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("doHttpGet {} : {}.", url, body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -134,6 +139,36 @@ public class Login {
 	}
 
 	/**
+	 *  cookie
+	 * @param cookieValue
+	 */
+	public void setCookieBIGipServerotsweb(String cookieValue){
+		
+		BasicClientCookie temp = new BasicClientCookie("BIGipServerotsweb",cookieValue);
+		temp.setDomain("dynamic.12306.cn");
+		temp.setPath("/");
+		((DefaultHttpClient) this.getHttpClient()).getCookieStore().addCookie(temp);
+		List<Cookie> cookies=((DefaultHttpClient) this.getHttpClient()).getCookieStore().getCookies();
+		for (Cookie cookie : cookies) {
+			LOG.debug("{}:{}",cookie.getName(),cookie.getValue());
+		}
+	}
+	/**
+	 * set cookie
+	 * @param cookieValue
+	 */
+	public void setCookieJSESSIONID(String cookieValue){
+		
+		BasicClientCookie temp = new BasicClientCookie("JSESSIONID",cookieValue);
+		temp.setDomain("dynamic.12306.cn");
+		temp.setPath("/otsweb");
+		((DefaultHttpClient) this.getHttpClient()).getCookieStore().addCookie(temp);
+		List<Cookie> cookies=((DefaultHttpClient) this.getHttpClient()).getCookieStore().getCookies();
+		for (Cookie cookie : cookies) {
+			LOG.debug("{}:{}",cookie.getName(),cookie.getValue());
+		}
+	}
+	/**
 	 * 访问下主页,获取cookie信息
 	 */
 	public void getMainPage() {
@@ -143,8 +178,7 @@ public class Login {
 			addHeader(get);
 			response = this.getHttpClient().execute(get);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(new GZIPInputStream(entity.getContent()), "UTF-8");
-//			String body = IOUtils.toString(entity.getContent(), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("getMainPage body : {}.", body);
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -167,7 +201,7 @@ public class Login {
 			addHeader(post);
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
-			String body = IOUtils.toString(entity.getContent(), "UTF-8");
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("getRandomCode body : {}.", body);
 			body = StringUtils.substringBetween(body, randomCodeOpen, randomCodeClose);
 			LOG.info("随机数为 : {}", body);
@@ -187,7 +221,7 @@ public class Login {
 	 * @return 验证码
 	 */
 	public String getCaptcha() {
-		HttpGet get = new HttpGet(this.loginCodeUrl);
+		HttpGet get = new HttpGet(this.loginCodeUrl+"&"+Math.random());
 		String captcha = "";
 		HttpResponse response = null;
 		try {
@@ -229,29 +263,49 @@ public class Login {
 	 */
 	private HttpEntity addParameters() {
 		try {
+			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			Map<String, String> tree = new TreeMap<String, String>();
+			//放入静态参数
+			tree.putAll(this.staticParameters);
 			Map<String, String> dynamic = new HashMap<String, String>();
 			dynamic.put("username", this.getUsername());
 			dynamic.put("password", this.getPassword());
-			dynamic.put("captcha", this.getCaptcha());
+//			dynamic.put("captcha", this.getCaptcha());
+			dynamic.put("captcha", "ABCD");
 			dynamic.put("loginRand", this.getRandomCode());
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-			// 组装静态参数
-			for (Map.Entry<String, String> entry : this.staticParameters.entrySet()) {
-				parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-			}
 			// 组装动态参数
 			for (Map.Entry<String, String> entry : this.dynamicParameters.entrySet()) {
 				// 参数名称可以动态修改
-				parameters.add(new BasicNameValuePair(entry.getKey(), dynamic.get(entry.getValue())));
+				tree.put(entry.getKey(), dynamic.get(entry.getValue()));
 			}
-
-			return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
+			// 组装排序后的参数
+			for (Map.Entry<String, String> entry : tree.entrySet()) {
+				//去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
+						.getValue()));
+			}
+//			return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
+			return new UrlEncodedFormEntity(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		}
 		return null;
 	}
 
+	private static InputStream getInputStream(HttpEntity entity)
+			throws IOException {
+		Header encoding = entity.getContentEncoding();
+		if (encoding != null) {
+			if (encoding.getValue().equals("gzip")
+					|| encoding.getValue().equals("zip")
+					|| encoding.getValue().equals(
+							"application/x-gzip-compressed")) {
+				return new GZIPInputStream(entity.getContent());
+			}
+		}
+		return entity.getContent();
+	}
 	/**
 	 * @return the httpClient httpClient
 	 */

@@ -53,5 +53,13 @@ public class LoginTest extends Base {
 		String body=login.doHttpGet("https://dynamic.12306.cn/otsweb/sysuser/editMemberAction.do?method=initEdit");
 		assertTrue(body.contains("手机号码")||body.contains("系统例行维护时间"));
 	}
+	@Test
+	public void setCookie() {
+		login.setCookieBIGipServerotsweb("2496921866.48160.0000");
+		login.setCookieJSESSIONID("201E216629BD14C066E1D2FE452F6C9F");
+		//获取个人资料来验证是否登录成功
+		String body=login.doHttpGet("https://dynamic.12306.cn/otsweb/sysuser/editMemberAction.do?method=initEdit");
+		assertTrue(body.contains("手机号码")||body.contains("系统例行维护时间"));
+	}
 
 }
