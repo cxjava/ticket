@@ -11,6 +11,7 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,22 +24,41 @@ import com.cxjava.ticket.ocr.OCR;
 public class OCRTest {
 	private static final Logger LOG = LoggerFactory.getLogger(OCRTest.class);
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
-//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
-	private static String SAVE_PATH = "f:\\Downloads\\12306\\";
+	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+
+	// private static String SAVE_PATH = "f:\\Downloads\\12306\\";
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// urlTest();
+		fileTest();
+	}
+
+	private static void urlTest() {
+
 		try {
 			for (int i = 1; i < 111; i++) {
-				InputStream input = new URL(URL+"&"+Math.random()).openStream();
+				InputStream input = new URL(URL + "&" + Math.random()).openStream();
 				BufferedImage bufferedImage = ImageIO.read(input);
 				String code = OCR.imageToString(bufferedImage);
 				LOG.debug("code : {}.", code);
-				File file = new File(SAVE_PATH + i + ".png");
+				File file = new File(SAVE_PATH + code + ".png");
 				ImageIO.write(bufferedImage, "png", file);
 			}
+		} catch (IOException e) {
+			LOG.error("e : {}.", e);
+		}
+
+	}
+
+	private static void fileTest() {
+		try {
+			InputStream input = FileUtils.openInputStream(new File(SAVE_PATH + "11.png"));
+			BufferedImage bufferedImage = ImageIO.read(input);
+			String code = OCR.imageToString(bufferedImage);
+			LOG.debug("code : {}.", code);
 		} catch (IOException e) {
 			LOG.error("e : {}.", e);
 		}
