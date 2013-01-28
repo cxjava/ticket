@@ -77,9 +77,10 @@ public class OCR {
 							break;
 						}
 						num7++;
+//						LOG.debug(i + "b[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, num10 });
 					}
+					LOG.debug(i + "b[] : {}.{},{},{},{}", new Object[] { num5, num6, num7, num8, num9 });
 					// LOG.debug("new Object[] : {}.{},{},{},{}", new Object[]{num5,num6,num7,num8,num9});
-					LOG.debug(i + "b[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
 					if ((num6 == num7) && (num8 != 0)) {
 						LOG.debug(i + "c[] : {}.{},{},{},{},{}",
 								new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
