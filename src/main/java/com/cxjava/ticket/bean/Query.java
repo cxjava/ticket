@@ -18,9 +18,12 @@ import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -28,7 +31,11 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -116,6 +123,23 @@ public class Query {
 		try {
 			addHeader(post,this.queryReferer);
 			post.setEntity(this.addConfirmParameters(info));
+			((DefaultHttpClient)this.getHttpClient()).setRedirectStrategy(new DefaultRedirectStrategy() {                
+                public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)  {
+                    boolean isRedirect=false;
+                    try {
+                        isRedirect = super.isRedirected(request, response, context);
+                    } catch (ProtocolException e) {
+                    	LOG.error("ProtocolException:{}", e);
+                    }
+                    if (!isRedirect) {
+                        int responseCode = response.getStatusLine().getStatusCode();
+                        if (responseCode == 301 || responseCode == 302) {
+                            return true;
+                        }
+                    }
+                    return isRedirect;
+                }
+            });
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
@@ -125,11 +149,11 @@ public class Query {
 			if (body.contains("常用联系人加载中，请稍候...")) {
 				LOG.info("常用联系人加载中，请稍候...");
 				Document doc = Jsoup.parse(body);
-				String TOKEN = doc.select("input[name='org.apache.struts.taglib.html.TOKEN']").attr("value");
-				String leftTicketStr = doc.select("input[name='leftTicketStr']").attr("value");
+				String TOKEN = doc.select("input[name=org.apache.struts.taglib.html.TOKEN]").attr("value");
+				String leftTicketStr = doc.select("input[name=leftTicketStr]").attr("value");
 				LOG.info("TOKEN：{}",TOKEN);
 				LOG.info("leftTicketStr：{}",leftTicketStr);
-				
+				//TODO:
 				return true;
 			} else {
 				LOG.info("登录失败消息 : {}", result);

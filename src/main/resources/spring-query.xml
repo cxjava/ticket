@@ -31,6 +31,7 @@
 		<property name="seatType" value="${seatType}" />
 		<property name="loginInfoOpen" value="${loginInfo.open}" />
 		<property name="loginInfoEnd" value="${loginInfo.end}" />
+		<property name="passengerJsonUrl" value="${passengerJsonUrl}" />
 		<property name="queryStaticParameters">
 			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
 				<entry key="11#method" value="queryLeftTicket" />

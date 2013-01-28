@@ -26,8 +26,8 @@ public class QueryTest extends Base {
 	@Before
 	public void before() {
 //		assertTrue(login.login());
-		login.setCookieBIGipServerotsweb("2496921866.48160.0000");
-		login.setCookieJSESSIONID("201E216629BD14C066E1D2FE452F6C9F");
+		login.setCookieBIGipServerotsweb("2698248458.62495.0000");
+		login.setCookieJSESSIONID("01C21A4946E5846ED91D178EF69B0188");
 		query.getQueryPage();
 	}
 
