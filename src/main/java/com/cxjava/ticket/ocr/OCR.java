@@ -21,6 +21,7 @@ public class OCR {
 	public static String imageToString(BufferedImage Image) {
 		Font b = new Font(imageToInt(Image));
 		Font[] bArray = WordStock.getFontsInstance();
+//		return getImageResult(process2list(b, bArray));
 		return getImageResult(getImageRsults(b, bArray));
 	}
 
@@ -41,17 +42,82 @@ public class OCR {
 		}
 		return numArray;
 	}
-
+	private static ArrayList<ImageResult> process2list(Font A_0, Font[] A_1) {
+		ArrayList<ImageResult> list = new ArrayList<ImageResult>();
+		for (int i = 0; i < A_1.length; i++) {
+			for (int j = 0; j <= A_0.getFontlengthH() - 1; j++) {
+				int num = A_0.getFontlengthH() - (A_1[i].getFontlengthH() / 2 + j);
+				for (int k = 0; k <= A_0.getFontlengthW(); k++) {
+					int num2 = k - A_1[i].getFontlengthW() / 2;
+					if (num2 < 0) {
+						num2 = 0;
+					}
+					int num3 = (A_1[i].getFontlengthW() + 1) / 2 + k;
+					if (num3 > A_0.getFontlengthW()) {
+						num3 = A_0.getFontlengthW();
+					}
+					int num4 = 0;
+					int num5 = 0;
+					int l;
+					for (l = num2; l < num3; l++) {
+						int num6 = (A_1[i].getFontlengthW() / 2 - k > 0) ? (A_1[i].getFontlengthW() / 2 - k) : 0;
+						int num7;
+						if (num > 0) {
+							num7 = (int) (A_1[i].getLFontsWH().get((num6 + l - num2)) << num);
+						} else {
+							num7 = (int) (A_1[i].getLFontsWH().get(num6 + l - num2) >> num * -1);
+						}
+						num7 &= (int) Math.pow(2.0, (double) A_0.getFontlengthH()) - 1;
+						num4 += chuliNumber(num7);
+						if (num4 == 0) {
+							num5++;
+						}
+						if (((num7 & A_0.getLFontsWH().get(l)) ^ num7) != 0) {
+							break;
+						}
+					}
+					if (l == num3 && num4 != 0) {
+						if (num > 0) {
+							if (A_1[i].getFontlengthH() + num < A_0.getFontlengthH()) {
+								A_1[i].getFontlengthH();
+							} else {
+								A_0.getFontlengthH();
+							}
+						} else {
+							A_1[i].getFontlengthH();
+						}
+						ImageResult item = new ImageResult(A_1[i].getImageChar(), num2 + num5, (float) num4 / (float) A_1[i].getEffectCount(),
+								A_1[i].getEffectCount());
+						list.add(item);
+					}
+				}
+			}
+		}
+		return list;
+	}
+	private static int chuliNumber(int A_0) {
+		int num = 0;
+		while ((long) num < (long) (A_0)) {
+			num++;
+			A_0 &= A_0 - 1;
+		}
+		return num;
+	}
 	private static ArrayList<ImageResult> getImageRsults(Font font, Font[] fontArray) {
 		ArrayList<ImageResult> list = new ArrayList<ImageResult>();
-		for (int i = 0; i < fontArray.length; i++) {
+		for (int i = 0; i < fontArray.length; i++) {//遍历特征库
+			//getFontlengthH 验证码高度
 			for (int j = 0; j <= (font.getFontlengthH() - 1); j++) {
+				//目标验证码减去特征库验证码高度一半
 				int num3 = font.getFontlengthH() - ((fontArray[i].getFontlengthH() / 2) + j);
+				//getFontlengthH 验证码宽度
 				for (int k = 0; k <= font.getFontlengthW(); k++) {
+					//目标验证码减去特征库验证码宽度一半
 					int num5 = k - (fontArray[i].getFontlengthW() / 2);
 					if (num5 < 0) {
 						num5 = 0;
 					}
+					//特征库验证码宽度一半
 					int num6 = ((fontArray[i].getFontlengthW() + 1) / 2) + k;
 					if (num6 > font.getFontlengthW()) {
 						num6 = font.getFontlengthW();
@@ -59,7 +125,7 @@ public class OCR {
 					int num8 = 0;
 					int num9 = 0;
 					int num7 = num5;
-//					LOG.debug(i + "a[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
+//					LOG.debug(i + "a[] : num5:{}.num6:{},num7:{},num8:{},num9:{}", new Object[] { num5, num6, num7, num8, num9});
 					while (num7 < num6) {
 						/* uint */long num10;
 						int num11 = (((fontArray[i].getFontlengthW() / 2) - k) > 0) ? ((fontArray[i].getFontlengthW() / 2) - k) : 0;
@@ -79,11 +145,15 @@ public class OCR {
 						num7++;
 //						LOG.debug(i + "b[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, num10 });
 					}
-					LOG.debug(i + "b[] : {}.{},{},{},{}", new Object[] { num5, num6, num7, num8, num9 });
-					// LOG.debug("new Object[] : {}.{},{},{},{}", new Object[]{num5,num6,num7,num8,num9});
-					if ((num6 == num7) && (num8 != 0)) {
-						LOG.debug(i + "c[] : {}.{},{},{},{},{}",
-								new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
+//					LOG.debug(i + "b[] : {}.{},{},{},{}", new Object[] { num5, num6, num7, num8, num9 });
+//					 LOG.debug(i+"new Object[] : {}.{},{},{}", new Object[]{num5,num6,num7,num8});
+					 if ((num6 == num7) && (num8 != 0)) {
+//					if (((float) num8)
+//							/ ((float) fontArray[i].getEffectCount())>0.6) {
+						LOG.debug(i+"new Object[] : {}.{},{},{},{},{}", new Object[]{num5,num6,num7,num8,fontArray[i].getEffectCount(), ((float) num8)
+								/ ((float) fontArray[i].getEffectCount())});
+//						LOG.debug(i + "c[] : {}.{},{},{},{},{}",
+//								new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
 						ImageResult item = new ImageResult(fontArray[i].getImageChar(), num5 + num9, ((float) num8)
 								/ ((float) fontArray[i].getEffectCount()), fontArray[i].getEffectCount());
 						list.add(item);
