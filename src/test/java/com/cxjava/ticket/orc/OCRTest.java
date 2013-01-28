@@ -25,6 +25,7 @@ public class OCRTest {
 	private static final Logger LOG = LoggerFactory.getLogger(OCRTest.class);
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
 	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+	private static String SAVE_PATH_OLD = "D:\\05_Document\\Downloads\\12306\\old\\";
 
 	// private static String SAVE_PATH = "f:\\Downloads\\12306\\";
 
@@ -33,7 +34,8 @@ public class OCRTest {
 	 */
 	public static void main(String[] args) {
 		// urlTest();
-		fileTest();
+//		fileTest();
+		folderTest();
 	}
 
 	private static void urlTest() {
@@ -60,6 +62,29 @@ public class OCRTest {
 			String code = OCR.imageToString(bufferedImage);
 			LOG.debug("code : {}.", code);
 		} catch (IOException e) {
+			LOG.error("e : {}.", e);
+		}
+		
+	}
+	private static void folderTest() {
+		try {
+			File dir = new File(SAVE_PATH_OLD);
+			if (dir.isDirectory()) {
+				File[] files = dir.listFiles();
+				for (File imgfile : files) {
+					try {
+						InputStream input = FileUtils.openInputStream(imgfile);
+						BufferedImage bufferedImage = ImageIO.read(input);
+						String code = OCR.imageToString(bufferedImage);
+						LOG.debug("code : {}.", code);
+						File file = new File(SAVE_PATH_OLD + code + ".png");
+						ImageIO.write(bufferedImage, "png", file);
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
+				}
+			}
+		} catch (Exception e) {
 			LOG.error("e : {}.", e);
 		}
 
