@@ -17,7 +17,8 @@ import javax.imageio.ImageIO;
  */
 public class OCRMake {
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
-	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+	private static String SAVE_PATH = "F:\\Downloads\\12306\\";
 
 	/**
 	 * @param args
