@@ -55,7 +55,7 @@ public class OCRTest {
 
 	private static void fileTest() {
 		try {
-			InputStream input = FileUtils.openInputStream(new File(SAVE_PATH + "11.png"));
+			InputStream input = FileUtils.openInputStream(new File(SAVE_PATH + "8.png"));
 			BufferedImage bufferedImage = ImageIO.read(input);
 			String code = OCR.imageToString(bufferedImage);
 			LOG.debug("code : {}.", code);

@@ -1,17 +1,22 @@
 package com.cxjava.ticket.ocr;
 
 import java.util.ArrayList;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.lang.Math;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Maty Chen
  * @date 2013-1-24上午10:24:21
  */
 public class OCR {
+	private static final Logger LOG = LoggerFactory.getLogger(OCR.class);
 
 	public static String imageToString(BufferedImage Image) {
 		Font b = new Font(imageToInt(Image));
@@ -19,19 +24,15 @@ public class OCR {
 		return getImageResult(getImageRsults(b, bArray));
 	}
 
-	private static Map<String, Integer> GetPixel(BufferedImage img, int x, int y) {
-		Map<String, Integer> rgbMap = new TreeMap<String, Integer>();
-		rgbMap.put("R", (img.getRGB(x, y) & 0xff0000) >> 16);
-		rgbMap.put("G", (img.getRGB(x, y) & 0xff00) >> 8);
-		rgbMap.put("B", (img.getRGB(x, y) & 0xff));
-		return rgbMap;
+	private static int getColorWeight(Color color) {
+		return (int) color.getRed() * 19595 + (int) color.getGreen() * 38469 + (int) color.getBlue() * 7472 >> 16;
 	}
 
-	private static int[][] imageToInt(BufferedImage img) {
+	public static int[][] imageToInt(BufferedImage img) {
 		int[][] numArray = new int[img.getHeight()][img.getWidth()];
 		for (int i = 0; i < img.getHeight(); i++) {
 			for (int j = 0; j < img.getWidth(); j++) {
-				if (170 < colorToInt(GetPixel(img, j, i))) {
+				if (170 < getColorWeight(new Color(img.getRGB(j, i)))) {
 					numArray[i][j] = 0;
 				} else {
 					numArray[i][j] = 1;
@@ -39,10 +40,6 @@ public class OCR {
 			}
 		}
 		return numArray;
-	}
-
-	private static int colorToInt(Map<String, Integer> color) {
-		return (((((color.get("R") & 0xFF) * 0x4c8b) + ((color.get("G") & 0xFF) * 0x9645)) + ((color.get("B") & 0xFF) * 0x1d30)) >> 0x10);
 	}
 
 	private static ArrayList<ImageResult> getImageRsults(Font font, Font[] fontArray) {
@@ -62,6 +59,7 @@ public class OCR {
 					int num8 = 0;
 					int num9 = 0;
 					int num7 = num5;
+//					LOG.debug(i + "a[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
 					while (num7 < num6) {
 						/* uint */long num10;
 						int num11 = (((fontArray[i].getFontlengthW() / 2) - k) > 0) ? ((fontArray[i].getFontlengthW() / 2) - k) : 0;
@@ -80,7 +78,11 @@ public class OCR {
 						}
 						num7++;
 					}
-					if ((num7 == num6) && (num8 != 0)) {
+					// LOG.debug("new Object[] : {}.{},{},{},{}", new Object[]{num5,num6,num7,num8,num9});
+					LOG.debug(i + "b[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
+					if ((num6 == num7) && (num8 != 0)) {
+						LOG.debug(i + "c[] : {}.{},{},{},{},{}",
+								new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
 						ImageResult item = new ImageResult(fontArray[i].getImageChar(), num5 + num9, ((float) num8)
 								/ ((float) fontArray[i].getEffectCount()), fontArray[i].getEffectCount());
 						list.add(item);
