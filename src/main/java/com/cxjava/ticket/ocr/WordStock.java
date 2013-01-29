@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * 字库点阵
- * 
+ * @see 来自<妈,我要回家>提供的字模
  * @author Maty Chen
  * @date 2013-1-24上午10:19:01
  */

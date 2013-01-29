@@ -30,7 +30,7 @@ public class OCR {
 		for (int i = 0; i < img.getHeight(); i++) {
 			for (int j = 0; j < img.getWidth(); j++) {
 				// old 170 get model use 170
-				if (190 < getColorWeight(new Color(img.getRGB(j, i)))) {
+				if (180 < getColorWeight(new Color(img.getRGB(j, i)))) {
 					numArray[i][j] = 0;
 				} else {
 					numArray[i][j] = 1;

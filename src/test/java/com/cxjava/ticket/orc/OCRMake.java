@@ -21,17 +21,17 @@ import org.slf4j.LoggerFactory;
 public class OCRMake {
 	private static final Logger LOG = LoggerFactory.getLogger(OCRMake.class);
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
-	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\CodeMode\\";
-//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\CodeMode\\";
+	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
 //	private static String SAVE_PATH = "F:\\Downloads\\12306\\";
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		save();
+		save();
 		// 可以先筛选质量好的图片，再打印
-		print();
+//		print();
 	}
 
 	/**
