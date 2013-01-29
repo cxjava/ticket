@@ -31,7 +31,6 @@
 	</appender>
 
 	<logger name="com.cxjava.ticket" level="DEBUG">
-		<appender-ref ref="logfile" />
 	</logger>
 
 	<root>

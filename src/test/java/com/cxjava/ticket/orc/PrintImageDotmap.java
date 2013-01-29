@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * 
  * @author leeass
@@ -24,7 +25,7 @@ public class PrintImageDotmap {
 			int[][] data = bitmap2DotArray(bi);
 
 			StringBuffer sb = new StringBuffer();
-			sb.append("{");
+			sb.append("numArray = new int[][] {");
 			for (int i = 0; i < data.length; i++) {
 				sb.append("\r\n{");
 				for (int j = 0; j < data[0].length; j++) {
@@ -36,7 +37,10 @@ public class PrintImageDotmap {
 					sb.append("},");
 				}
 			}
-			sb.append("\r\n}\r\n");
+			sb.append("\r\n};\r\n");
+			sb.append("list.add( new Font('");
+			sb.append(imgfile.getName().substring(0, 1));
+			sb.append("', numArray));");
 			LOG.info(sb.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -45,16 +49,24 @@ public class PrintImageDotmap {
 
 	public static void allImageDot(String folder) {
 		File dir = new File(folder);
+		int i=0;
 		if (dir.isDirectory()) {
 			File[] files = dir.listFiles();
 			for (File imgfile : files) {
 				try {
-						LOG.info(imgfile.getName());
+					if(i%70==0){
+						LOG.info("return list; }");
+						LOG.info("private static List<Font> getFonts"+i/70+"() {");
+						LOG.info("List<Font> list = new ArrayList<Font>(); int[][]");
+					}
+//						LOG.info(imgfile.getName());
 						printImage(imgfile);
+						i++;
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}
 			}
+			LOG.info("return list; }");
 		}
 	}
 
