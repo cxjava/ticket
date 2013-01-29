@@ -8,6 +8,9 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * 产生字符特征库
@@ -16,17 +19,18 @@ import javax.imageio.ImageIO;
  * @date 2013-1-28下午2:37:07
  */
 public class OCRMake {
+	private static final Logger LOG = LoggerFactory.getLogger(OCRMake.class);
 	private static String URL = "http://dynamic.12306.cn/otsweb/passCodeAction.do?rand=sjrand";
-//	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
-	private static String SAVE_PATH = "F:\\Downloads\\12306\\";
+	private static String SAVE_PATH = "D:\\05_Document\\Downloads\\12306\\";
+//	private static String SAVE_PATH = "F:\\Downloads\\12306\\";
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		save();
+		save();
 		// 可以先筛选质量好的图片，再打印
-		print();
+//		print();
 	}
 
 	/**
@@ -41,8 +45,8 @@ public class OCRMake {
 	 */
 	private static void save() {
 		try {
-			for (int i = 1; i < 50; i++) {
-				InputStream input = new URL(URL + "&" + Math.random()).openStream();
+			for (int i = 1; i < 800; i++) {
+				InputStream input = new URL(URL + "&" + Math.random()+ "&" + Math.random()).openStream();
 				BufferedImage bufferedImage = ImageIO.read(input);
 				// String code = OCR.imageToString(bufferedImage);
 				// LOG.debug("code : {}.", code);
@@ -50,6 +54,7 @@ public class OCRMake {
 				ImageIO.write(bufferedImage, "png", file);
 			}
 		} catch (IOException e) {
+			LOG.error("e : {}.", e);
 		}
 
 	}

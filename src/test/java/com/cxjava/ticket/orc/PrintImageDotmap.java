@@ -49,8 +49,8 @@ public class PrintImageDotmap {
 			File[] files = dir.listFiles();
 			for (File imgfile : files) {
 				try {
-					LOG.info(imgfile.getName());
-					printImage(imgfile);
+						LOG.info(imgfile.getName());
+						printImage(imgfile);
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}
@@ -64,7 +64,7 @@ public class PrintImageDotmap {
 		for (int i = 0; i < buffImage.getHeight(); i++) {
 			for (int j = 0; j < buffImage.getWidth(); j++) {
 
-				if (170 < getColorWeight(new Color(buffImage.getRGB(j, i)))) {
+				if (168 < getColorWeight(new Color(buffImage.getRGB(j, i)))) {
 					array[i][j] = 0;
 				} else {
 					array[i][j] = 1;
