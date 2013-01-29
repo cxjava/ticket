@@ -8,15 +8,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Maty Chen
  * @date 2013-1-24上午10:24:21
  */
 public class OCR {
-	private static final Logger LOG = LoggerFactory.getLogger(OCR.class);
 
 	public static String imageToString(BufferedImage Image) {
 		Font b = new Font(imageToInt(Image));
@@ -33,7 +29,8 @@ public class OCR {
 		int[][] numArray = new int[img.getHeight()][img.getWidth()];
 		for (int i = 0; i < img.getHeight(); i++) {
 			for (int j = 0; j < img.getWidth(); j++) {
-				if (170 < getColorWeight(new Color(img.getRGB(j, i)))) {
+				// old 170 get model use 170
+				if (190 < getColorWeight(new Color(img.getRGB(j, i)))) {
 					numArray[i][j] = 0;
 				} else {
 					numArray[i][j] = 1;
@@ -125,7 +122,6 @@ public class OCR {
 					int num8 = 0;
 					int num9 = 0;
 					int num7 = num5;
-//					LOG.debug(i + "a[] : num5:{}.num6:{},num7:{},num8:{},num9:{}", new Object[] { num5, num6, num7, num8, num9});
 					while (num7 < num6) {
 						/* uint */long num10;
 						int num11 = (((fontArray[i].getFontlengthW() / 2) - k) > 0) ? ((fontArray[i].getFontlengthW() / 2) - k) : 0;
@@ -143,17 +139,8 @@ public class OCR {
 							break;
 						}
 						num7++;
-//						LOG.debug(i + "b[] : {}.{},{},{},{},{}", new Object[] { num5, num6, num7, num8, num9, num10 });
 					}
-//					LOG.debug(i + "b[] : {}.{},{},{},{}", new Object[] { num5, num6, num7, num8, num9 });
-//					 LOG.debug(i+"new Object[] : {}.{},{},{}", new Object[]{num5,num6,num7,num8});
 					 if ((num6 == num7) && (num8 != 0)) {
-//					if (((float) num8)
-//							/ ((float) fontArray[i].getEffectCount())>0.6) {
-						LOG.debug(i+"new Object[] : {}.{},{},{},{},{}", new Object[]{num5,num6,num7,num8,fontArray[i].getEffectCount(), ((float) num8)
-								/ ((float) fontArray[i].getEffectCount())});
-//						LOG.debug(i + "c[] : {}.{},{},{},{},{}",
-//								new Object[] { num5, num6, num7, num8, num9, fontArray[i].getEffectCount() });
 						ImageResult item = new ImageResult(fontArray[i].getImageChar(), num5 + num9, ((float) num8)
 								/ ((float) fontArray[i].getEffectCount()), fontArray[i].getEffectCount());
 						list.add(item);
