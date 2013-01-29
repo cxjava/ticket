@@ -43,9 +43,9 @@ public class BinaryTest {
 			for (int y = 0; y < h; y++) {
 				int argb = bufferedImage.getRGB(x, y);
 				// 图像加亮（调整亮度识别率非常高）
-				int r = (int) (((argb >> 16) & 0xFF) * 1.9 + 70);
-				int g = (int) (((argb >> 8) & 0xFF) * 1.9 + 70);
-				int b = (int) (((argb >> 0) & 0xFF) * 1.9 + 70);
+				int r = (int) (((argb >> 16) & 0xFF) * 0.5 + 20);
+				int g = (int) (((argb >> 8) & 0xFF) * 0.5 + 20);
+				int b = (int) (((argb >> 0) & 0xFF) * 0.5 + 20);
 				if (r >= 255) {
 					r = 255;
 				}
