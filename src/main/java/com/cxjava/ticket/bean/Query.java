@@ -23,15 +23,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cxjava.ticket.ocr.OCR;
+
 /**
  * 查询车票
  * 
@@ -62,9 +63,9 @@ public class Query {
 	private HashMap<String, String> queryDynamicParameters;
 	/** 表单提交静态参数 */
 	private HashMap<String, String> confirmStaticParameters;
-	/** 表单提交动态参数之来源于页面*/
+	/** 表单提交动态参数之来源于页面 */
 	private HashMap<String, String> confirmMapDynamicParameters;
-	/** 表单提交动态参数之来源于查询结果*/
+	/** 表单提交动态参数之来源于查询结果 */
 	private HashMap<String, String> confirmArrayDynamicParameters;
 	/** 是否开启代理 */
 	private String isProxy;
@@ -112,8 +113,12 @@ public class Query {
 	private String loginInfoOpen;
 	/** 信息返回结果截取的后半部分 */
 	private String loginInfoEnd;
+	/** 加载联系人URL */
+	private String passengerJsonUrl;
+
 	/**
 	 * 提交车票订单
+	 * 
 	 * @return
 	 */
 	public boolean submutOrder(String info) {
@@ -121,25 +126,25 @@ public class Query {
 		String result = "";
 		HttpResponse response = null;
 		try {
-			addHeader(post,this.queryReferer);
+			addHeader(post, this.queryReferer);
 			post.setEntity(this.addConfirmParameters(info));
-			((DefaultHttpClient)this.getHttpClient()).setRedirectStrategy(new DefaultRedirectStrategy() {                
-                public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)  {
-                    boolean isRedirect=false;
-                    try {
-                        isRedirect = super.isRedirected(request, response, context);
-                    } catch (ProtocolException e) {
-                    	LOG.error("ProtocolException:{}", e);
-                    }
-                    if (!isRedirect) {
-                        int responseCode = response.getStatusLine().getStatusCode();
-                        if (responseCode == 301 || responseCode == 302) {
-                            return true;
-                        }
-                    }
-                    return isRedirect;
-                }
-            });
+			((DefaultHttpClient) this.getHttpClient()).setRedirectStrategy(new DefaultRedirectStrategy() {
+				public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) {
+					boolean isRedirect = false;
+					try {
+						isRedirect = super.isRedirected(request, response, context);
+					} catch (ProtocolException e) {
+						LOG.error("ProtocolException:{}", e);
+					}
+					if (!isRedirect) {
+						int responseCode = response.getStatusLine().getStatusCode();
+						if (responseCode == 301 || responseCode == 302) {
+							return true;
+						}
+					}
+					return isRedirect;
+				}
+			});
 			response = this.getHttpClient().execute(post);
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
@@ -151,9 +156,9 @@ public class Query {
 				Document doc = Jsoup.parse(body);
 				String TOKEN = doc.select("input[name=org.apache.struts.taglib.html.TOKEN]").attr("value");
 				String leftTicketStr = doc.select("input[name=leftTicketStr]").attr("value");
-				LOG.info("TOKEN：{}",TOKEN);
-				LOG.info("leftTicketStr：{}",leftTicketStr);
-				//TODO:
+				LOG.info("TOKEN：{}", TOKEN);
+				LOG.info("leftTicketStr：{}", leftTicketStr);
+				// TODO:
 				return true;
 			} else {
 				LOG.info("登录失败消息 : {}", result);
@@ -167,6 +172,7 @@ public class Query {
 		}
 		return false;
 	}
+
 	/**
 	 * 查询车票信息
 	 * 
@@ -183,8 +189,7 @@ public class Query {
 			LOG.debug("querySingleAction body : {}.", body);
 			Document doc = Jsoup.parse(body);
 			String text = doc.text();
-			String onclickText = doc.select("a").removeAttr("name")
-					.removeAttr("class").removeAttr("style").toString();
+			String onclickText = doc.select("a").removeAttr("name").removeAttr("class").removeAttr("style").toString();
 			LOG.debug("text() : {}.", text);
 			LOG.debug("onclickText() : {}.", onclickText);
 			return find(text, onclickText);
@@ -196,6 +201,26 @@ public class Query {
 			get.releaseConnection();
 		}
 		return null;
+	}
+
+	/**
+	 * 获取联系人列表
+	 */
+	public void postPassenger() {
+		HttpPost post = new HttpPost(this.passengerJsonUrl);
+		HttpResponse response = null;
+		try {
+			addHeader(post, this.confirmReferer);
+			response = this.getHttpClient().execute(post);
+			HttpEntity entity = response.getEntity();
+			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
+			LOG.debug("submutOrder body : {}.", body);
+		} catch (Exception e) {
+			LOG.error("Exception: {}", e);
+		} finally {
+			HttpClientUtils.closeQuietly(response);
+			post.releaseConnection();
+		}
 	}
 
 	/**
@@ -254,8 +279,7 @@ public class Query {
 			HttpEntity entity = response.getEntity();
 			String body = IOUtils.toString(getInputStream(entity), "UTF-8");
 			LOG.debug("getStationName body : {}.", body);
-			body = StringUtils.substringBetween(body, this.stationOpen,
-					this.stationEnd);
+			body = StringUtils.substringBetween(body, this.stationOpen, this.stationEnd);
 			for (String temp : body.split("@")) {
 				if (StringUtils.isNotBlank(temp)) {
 					String[] name = temp.split("\\|");
@@ -321,7 +345,9 @@ public class Query {
 	 * @param bodyText
 	 *            0,K1094,成都东 00:35,汉口 20:07,19:32,--,--,--,--,--,--,无,--,有,有,--,预订\n1,L20,成都东....
 	 * @param onclick
-	 *            <a onclick="javascript:getSelected('T126#16:42#22:49#760000T12602#CDW#WCN#15:31#成都#武昌#01#12#1*****33784*****00001*****05943*****0000#B8D4989A7284E8DD60F8CC0A5115F662310F968C71D2E1BF84BDA222#W1')">预订</a>
+	 *            <a onclick=
+	 *            "javascript:getSelected('T126#16:42#22:49#760000T12602#CDW#WCN#15:31#成都#武昌#01#12#1*****33784*****00001*****05943*****0000#B8D4989A7284E8DD60F8CC0A5115F662310F968C71D2E1BF84BDA222#W1')"
+	 *            >预订</a>
 	 * 
 	 */
 	public String find(String bodyText, String onclick) {
@@ -337,15 +363,15 @@ public class Query {
 				for (int i = 0; i < info.length; i++) {
 					// 如果这个席别有票，就取出来，和期望的seatType做比较
 					if (HAVE.equals(info[i])) {
-						//用getSelected里面的值做value
-						//getSelected('K390#22:09#10:10#760000K39002#CDW#WCN#08:19#成都#武昌#01#16#1*****32544*****00001*****04243*****0095#F2AA3083846AE60533BCE14599AD641B41446B21B49BBEEA4AA18F69#W1')">预订</a>
-						seats.put( train + Integer.toString(i), train + StringUtils.substringBetween(onclick, train, "')"));
+						// 用getSelected里面的值做value
+						// getSelected('K390#22:09#10:10#760000K39002#CDW#WCN#08:19#成都#武昌#01#16#1*****32544*****00001*****04243*****0095#F2AA3083846AE60533BCE14599AD641B41446B21B49BBEEA4AA18F69#W1')">预订</a>
+						seats.put(train + Integer.toString(i), train + StringUtils.substringBetween(onclick, train, "')"));
 					}
 				}
 			}
 		}
 		LOG.debug("seats : {}.", seats);
-		//和期望的席别做比较
+		// 和期望的席别做比较
 		String[] seatTypes = StringUtils.split(seatType, "\\|");
 		for (String seatType : seatTypes) {
 			for (String train : trains) {
@@ -380,11 +406,11 @@ public class Query {
 	private String addQueryParameters() {
 		try {
 			// 获取最新车站信息
-			Map<String, String> cityMap = getStationName();
-//			Map<String, String> cityMap = getStationNameStatic();
-			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			// Map<String, String> cityMap = getStationName();
+			Map<String, String> cityMap = getStationNameStatic();
+			// treeMap可以根据key排序，铁道部TMD非要顺序正确
 			Map<String, String> tree = new TreeMap<String, String>();
-			//放入静态参数
+			// 放入静态参数
 			tree.putAll(this.queryStaticParameters);
 			Map<String, String> dynamic = new HashMap<String, String>();
 			dynamic.put("trainDate", this.trainDate);
@@ -403,17 +429,17 @@ public class Query {
 			}
 			// 组装排序后的参数
 			for (Map.Entry<String, String> entry : tree.entrySet()) {
-				//去掉序号和#号
-				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
-						.getValue()));
+				// 去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry.getValue()));
 			}
-			
+
 			return URLEncodedUtils.format(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
 		}
 		return null;
 	}
+
 	/**
 	 * 添加提交表单参数
 	 * 
@@ -422,13 +448,13 @@ public class Query {
 	private HttpEntity addConfirmParameters(String info) {
 		try {
 			// 获取最新车站信息
-			 Map<String, String> cityMap = getStationName();
-//			Map<String, String> cityMap = getStationNameStatic();
-			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			Map<String, String> cityMap = getStationName();
+			// Map<String, String> cityMap = getStationNameStatic();
+			// treeMap可以根据key排序，铁道部TMD非要顺序正确
 			Map<String, String> tree = new TreeMap<String, String>();
-			//放入静态参数
+			// 放入静态参数
 			tree.putAll(this.confirmStaticParameters);
-			
+
 			Map<String, String> dynamic = new HashMap<String, String>();
 			if (StringUtils.isNotBlank(this.goTime)) {
 				dynamic.put("goTime", this.goTime);
@@ -442,26 +468,23 @@ public class Query {
 			dynamic.put("toStation", toStation);
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 			// 组装动态参数
-			for (Map.Entry<String, String> entry : this.confirmMapDynamicParameters
-					.entrySet()) {
+			for (Map.Entry<String, String> entry : this.confirmMapDynamicParameters.entrySet()) {
 				// 参数名称可以动态修改
 				tree.put(entry.getKey(), dynamic.get(entry.getValue()));
 			}
-			if(StringUtils.isNotBlank(info)){
-				LOG.debug("info:{}",info);
-				String [] arrays = StringUtils.split(info, "#");
-				for (Map.Entry<String, String> entry : this.confirmArrayDynamicParameters
-						.entrySet()) {
+			if (StringUtils.isNotBlank(info)) {
+				LOG.debug("info:{}", info);
+				String[] arrays = StringUtils.split(info, "#");
+				for (Map.Entry<String, String> entry : this.confirmArrayDynamicParameters.entrySet()) {
 					// 参数名称可以动态修改
-					int index=Integer.valueOf(entry.getValue());
+					int index = Integer.valueOf(entry.getValue());
 					tree.put(entry.getKey(), arrays[index]);
 				}
 			}
 			// 组装排序后的参数
 			for (Map.Entry<String, String> entry : tree.entrySet()) {
-				//去掉序号和#号
-				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
-						.getValue()));
+				// 去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry.getValue()));
 			}
 			return new UrlEncodedFormEntity(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
@@ -469,29 +492,27 @@ public class Query {
 		}
 		return null;
 	}
-	private static InputStream getInputStream(HttpEntity entity)
-			throws IOException {
+
+	private static InputStream getInputStream(HttpEntity entity) throws IOException {
 		Header encoding = entity.getContentEncoding();
 		if (encoding != null) {
-			if (encoding.getValue().equals("gzip")
-					|| encoding.getValue().equals("zip")
-					|| encoding.getValue().equals(
-							"application/x-gzip-compressed")) {
+			if (encoding.getValue().equals("gzip") || encoding.getValue().equals("zip")
+					|| encoding.getValue().equals("application/x-gzip-compressed")) {
 				return new GZIPInputStream(entity.getContent());
 			}
 		}
 		return entity.getContent();
 	}
+
 	/**
 	 * @return the httpClient httpClient
 	 */
 	public HttpClient getHttpClient() {
 		if ("true".equals(this.getIsProxy())) {
-			HttpHost proxy = new HttpHost(this.getProxyIp(),
-					this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
-			this.httpClient.getParams().setParameter(
-					ConnRoutePNames.DEFAULT_PROXY, proxy);
+			HttpHost proxy = new HttpHost(this.getProxyIp(), this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
+			this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		}
+		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.NETSCAPE);
 		return httpClient;
 	}
 
@@ -529,8 +550,7 @@ public class Query {
 	 * @param queryStaticParameters
 	 *            the queryStaticParameters to set 静态提交参数
 	 */
-	public void setQueryStaticParameters(
-			HashMap<String, String> queryStaticParameters) {
+	public void setQueryStaticParameters(HashMap<String, String> queryStaticParameters) {
 		this.queryStaticParameters = queryStaticParameters;
 	}
 
@@ -545,8 +565,7 @@ public class Query {
 	 * @param queryDynamicParameters
 	 *            the queryDynamicParameters to set 动态提交参数
 	 */
-	public void setQueryDynamicParameters(
-			HashMap<String, String> queryDynamicParameters) {
+	public void setQueryDynamicParameters(HashMap<String, String> queryDynamicParameters) {
 		this.queryDynamicParameters = queryDynamicParameters;
 	}
 
@@ -873,10 +892,10 @@ public class Query {
 	}
 
 	/**
-	 * @param confirmStaticParameters the confirmStaticParameters to set
+	 * @param confirmStaticParameters
+	 *            the confirmStaticParameters to set
 	 */
-	public void setConfirmStaticParameters(
-			HashMap<String, String> confirmStaticParameters) {
+	public void setConfirmStaticParameters(HashMap<String, String> confirmStaticParameters) {
 		this.confirmStaticParameters = confirmStaticParameters;
 	}
 
@@ -888,10 +907,10 @@ public class Query {
 	}
 
 	/**
-	 * @param confirmMapDynamicParameters the confirmMapDynamicParameters to set
+	 * @param confirmMapDynamicParameters
+	 *            the confirmMapDynamicParameters to set
 	 */
-	public void setConfirmMapDynamicParameters(
-			HashMap<String, String> confirmMapDynamicParameters) {
+	public void setConfirmMapDynamicParameters(HashMap<String, String> confirmMapDynamicParameters) {
 		this.confirmMapDynamicParameters = confirmMapDynamicParameters;
 	}
 
@@ -903,35 +922,56 @@ public class Query {
 	}
 
 	/**
-	 * @param confirmArrayDynamicParameters the confirmArrayDynamicParameters to set
+	 * @param confirmArrayDynamicParameters
+	 *            the confirmArrayDynamicParameters to set
 	 */
-	public void setConfirmArrayDynamicParameters(
-			HashMap<String, String> confirmArrayDynamicParameters) {
+	public void setConfirmArrayDynamicParameters(HashMap<String, String> confirmArrayDynamicParameters) {
 		this.confirmArrayDynamicParameters = confirmArrayDynamicParameters;
 	}
+
 	/**
 	 * @return the loginInfoOpen
 	 */
 	public String getLoginInfoOpen() {
 		return loginInfoOpen;
 	}
+
 	/**
-	 * @param loginInfoOpen the loginInfoOpen to set
+	 * @param loginInfoOpen
+	 *            the loginInfoOpen to set
 	 */
 	public void setLoginInfoOpen(String loginInfoOpen) {
 		this.loginInfoOpen = loginInfoOpen;
 	}
+
 	/**
 	 * @return the loginInfoEnd
 	 */
 	public String getLoginInfoEnd() {
 		return loginInfoEnd;
 	}
+
 	/**
-	 * @param loginInfoEnd the loginInfoEnd to set
+	 * @param loginInfoEnd
+	 *            the loginInfoEnd to set
 	 */
 	public void setLoginInfoEnd(String loginInfoEnd) {
 		this.loginInfoEnd = loginInfoEnd;
+	}
+
+	/**
+	 * @return the passengerJsonUrl 加载联系人URL
+	 */
+	public String getPassengerJsonUrl() {
+		return passengerJsonUrl;
+	}
+
+	/**
+	 * @param passengerJsonUrl
+	 *            the passengerJsonUrl to set 加载联系人URL
+	 */
+	public void setPassengerJsonUrl(String passengerJsonUrl) {
+		this.passengerJsonUrl = passengerJsonUrl;
 	}
 
 }

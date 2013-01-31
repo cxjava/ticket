@@ -25,9 +25,10 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
@@ -87,7 +88,7 @@ public class Login {
 	 * @return
 	 */
 	public boolean login() {
-		//到主页溜达一圈
+		// 到主页溜达一圈
 		getMainPage();
 		HttpPost post = new HttpPost(this.loginFormUrl);
 		String result = "";
@@ -139,35 +140,29 @@ public class Login {
 	}
 
 	/**
-	 *  cookie
+	 * cookie
+	 * 
 	 * @param cookieValue
 	 */
-	public void setCookieBIGipServerotsweb(String cookieValue){
-		
-		BasicClientCookie temp = new BasicClientCookie("BIGipServerotsweb",cookieValue);
+	public void setCookieBIGipServerotsweb(String cookieValue) {
+		BasicClientCookie temp = new BasicClientCookie("BIGipServerotsweb", cookieValue);
 		temp.setDomain("dynamic.12306.cn");
 		temp.setPath("/");
 		((DefaultHttpClient) this.getHttpClient()).getCookieStore().addCookie(temp);
-		List<Cookie> cookies=((DefaultHttpClient) this.getHttpClient()).getCookieStore().getCookies();
-		for (Cookie cookie : cookies) {
-			LOG.debug("{}:{}",cookie.getName(),cookie.getValue());
-		}
 	}
+
 	/**
 	 * set cookie
+	 * 
 	 * @param cookieValue
 	 */
-	public void setCookieJSESSIONID(String cookieValue){
-		
-		BasicClientCookie temp = new BasicClientCookie("JSESSIONID",cookieValue);
+	public void setCookieJSESSIONID(String cookieValue) {
+		BasicClientCookie temp = new BasicClientCookie("JSESSIONID", cookieValue);
 		temp.setDomain("dynamic.12306.cn");
 		temp.setPath("/otsweb");
 		((DefaultHttpClient) this.getHttpClient()).getCookieStore().addCookie(temp);
-		List<Cookie> cookies=((DefaultHttpClient) this.getHttpClient()).getCookieStore().getCookies();
-		for (Cookie cookie : cookies) {
-			LOG.debug("{}:{}",cookie.getName(),cookie.getValue());
-		}
 	}
+
 	/**
 	 * 访问下主页,获取cookie信息
 	 */
@@ -221,7 +216,7 @@ public class Login {
 	 * @return 验证码
 	 */
 	public String getCaptcha() {
-		HttpGet get = new HttpGet(this.loginCodeUrl+"&"+Math.random());
+		HttpGet get = new HttpGet(this.loginCodeUrl + "&" + Math.random());
 		String captcha = "";
 		HttpResponse response = null;
 		try {
@@ -263,14 +258,14 @@ public class Login {
 	 */
 	private HttpEntity addParameters() {
 		try {
-			//treeMap可以根据key排序，铁道部TMD非要顺序正确
+			// treeMap可以根据key排序，铁道部TMD非要顺序正确
 			Map<String, String> tree = new TreeMap<String, String>();
-			//放入静态参数
+			// 放入静态参数
 			tree.putAll(this.staticParameters);
 			Map<String, String> dynamic = new HashMap<String, String>();
 			dynamic.put("username", this.getUsername());
 			dynamic.put("password", this.getPassword());
-//			dynamic.put("captcha", this.getCaptcha());
+			// dynamic.put("captcha", this.getCaptcha());
 			dynamic.put("captcha", "ABCD");
 			dynamic.put("loginRand", this.getRandomCode());
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
@@ -281,11 +276,10 @@ public class Login {
 			}
 			// 组装排序后的参数
 			for (Map.Entry<String, String> entry : tree.entrySet()) {
-				//去掉序号和#号
-				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry
-						.getValue()));
+				// 去掉序号和#号
+				parameters.add(new BasicNameValuePair(entry.getKey().replaceFirst("\\d{1,3}#", ""), entry.getValue()));
 			}
-//			return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
+			// return new UrlEncodedFormEntity(parameters, HTTP.DEF_PROTOCOL_CHARSET.name());
 			return new UrlEncodedFormEntity(parameters, Consts.UTF_8.name());
 		} catch (Exception e) {
 			LOG.error("Exception: {}", e);
@@ -293,19 +287,17 @@ public class Login {
 		return null;
 	}
 
-	private static InputStream getInputStream(HttpEntity entity)
-			throws IOException {
+	private static InputStream getInputStream(HttpEntity entity) throws IOException {
 		Header encoding = entity.getContentEncoding();
 		if (encoding != null) {
-			if (encoding.getValue().equals("gzip")
-					|| encoding.getValue().equals("zip")
-					|| encoding.getValue().equals(
-							"application/x-gzip-compressed")) {
+			if (encoding.getValue().equals("gzip") || encoding.getValue().equals("zip")
+					|| encoding.getValue().equals("application/x-gzip-compressed")) {
 				return new GZIPInputStream(entity.getContent());
 			}
 		}
 		return entity.getContent();
 	}
+
 	/**
 	 * @return the httpClient httpClient
 	 */
@@ -314,6 +306,7 @@ public class Login {
 			HttpHost proxy = new HttpHost(this.getProxyIp(), this.getProxyPort(), HttpHost.DEFAULT_SCHEME_NAME);
 			this.httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		}
+		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.NETSCAPE);
 		return httpClient;
 	}
 

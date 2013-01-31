@@ -26,8 +26,8 @@ public class QueryTest extends Base {
 	@Before
 	public void before() {
 //		assertTrue(login.login());
-		login.setCookieBIGipServerotsweb("2698248458.62495.0000");
-		login.setCookieJSESSIONID("01C21A4946E5846ED91D178EF69B0188");
+		login.setCookieBIGipServerotsweb("2463367434.36895.0000");
+		login.setCookieJSESSIONID("BF2A70459974CBFE3F0EBE8F85EC1898");
 		query.getQueryPage();
 	}
 
@@ -47,10 +47,15 @@ public class QueryTest extends Base {
 		assertNotNull(query.querySingleAction());
 	}
 	@Test
-	public void submutOrder() {
+	public void submutOrder() throws InterruptedException {
 		String info=query.querySingleAction();
 		assertNotNull(info);
+		Thread.sleep(3000);
 		query.submutOrder(info);
+	}
+	@Test
+	public void postPassenger() {
+		query.postPassenger();
 	}
 
 }

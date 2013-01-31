@@ -61,7 +61,7 @@
 		</property>
 		<property name="userAgent" value="${userAgent}" />
 		<property name="contentCharset" value="UTF-8" />
-		<property name="useExpectContinue" value="true" />
+		<property name="useExpectContinue" value="false" />
 	</bean>
 
 	<bean id="connectionManager" class="org.apache.http.impl.conn.PoolingClientConnectionManager" destroy-method="shutdown">

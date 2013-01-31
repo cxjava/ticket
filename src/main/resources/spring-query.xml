@@ -32,6 +32,7 @@
 		<property name="loginInfoOpen" value="${loginInfo.open}" />
 		<property name="loginInfoEnd" value="${loginInfo.end}" />
 		<property name="passengerJsonUrl" value="${passengerJsonUrl}" />
+		<property name="checkOrderInfoUrl" value="${checkOrderInfoUrl}" />
 		<property name="queryStaticParameters">
 			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
 				<entry key="11#method" value="queryLeftTicket" />
@@ -85,6 +86,16 @@
 				<entry key="33#ypInfoDetail" value="12" />
 				<entry key="34#mmStr" value="13" />
 				<entry key="35#locationCode" value="14" />
+			</map>
+		</property>
+		
+		<property name="checkOrderStaticParameters">
+			<map><!-- #号之前为参数顺序，请以11开始，即11为第一个参数 -->
+				<entry key="11#seattype_num" value="" />
+				<entry key="21#single_round_type" value="1" />
+				<entry key="22#train_pass_type" value="QB" />
+				<entry key="23#train_class_arr" value="QB#D#Z#T#K#QT#" />
+				<entry key="16#include_student" value="00" />
 			</map>
 		</property>
 	</bean>

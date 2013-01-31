@@ -110,7 +110,6 @@ public class Binary {
 		LOG.debug(" ostu2(gray, w, h) : {}.",  ostu2(gray, w, h));
 		LOG.debug(" ostu(gray, w, h) : {}.",  ostu(gray, w, h));
 		int threshold = ostu2(gray, w, h);
-		ClearNoise(bufferedImage,threshold,w*h);
 		BufferedImage binaryBufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_BINARY);
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -122,6 +121,7 @@ public class Binary {
 				binaryBufferedImage.setRGB(x, y, gray[x][y]);
 			}
 		}
+		ClearNoise(binaryBufferedImage,threshold,8);
 		// 矩阵打印
 		// for (int y = 0; y < h; y++) {
 		// for (int x = 0; x < w; x++) {
