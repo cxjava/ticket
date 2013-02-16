@@ -67,6 +67,8 @@ public class Query {
 	private HashMap<String, String> confirmMapDynamicParameters;
 	/** 表单提交动态参数之来源于查询结果 */
 	private HashMap<String, String> confirmArrayDynamicParameters;
+	/** 检查订单时候的参数 */
+	private HashMap<String, String> checkOrderStaticParameters;
 	/** 是否开启代理 */
 	private String isProxy;
 	/** 代理ip */
@@ -115,6 +117,8 @@ public class Query {
 	private String loginInfoEnd;
 	/** 加载联系人URL */
 	private String passengerJsonUrl;
+	/** 检查订单 */
+	private String checkOrderInfoUrl;
 
 	/**
 	 * 提交车票订单
@@ -972,6 +976,34 @@ public class Query {
 	 */
 	public void setPassengerJsonUrl(String passengerJsonUrl) {
 		this.passengerJsonUrl = passengerJsonUrl;
+	}
+
+	/**
+	 * @return the checkOrderInfoUrl
+	 检查订单 */
+	public String getCheckOrderInfoUrl() {
+		return checkOrderInfoUrl;
+	}
+
+	/**
+	 * @param checkOrderInfoUrl the checkOrderInfoUrl to set
+	 检查订单 */
+	public void setCheckOrderInfoUrl(String checkOrderInfoUrl) {
+		this.checkOrderInfoUrl = checkOrderInfoUrl;
+	}
+
+	/**
+	 * @return the checkOrderStaticParameters
+	 检查订单时候的参数 */
+	public HashMap<String, String> getCheckOrderStaticParameters() {
+		return checkOrderStaticParameters;
+	}
+
+	/**
+	 * @param checkOrderStaticParameters the checkOrderStaticParameters to set
+	 检查订单时候的参数 */
+	public void setCheckOrderStaticParameters(HashMap<String, String> checkOrderStaticParameters) {
+		this.checkOrderStaticParameters = checkOrderStaticParameters;
 	}
 
 }
